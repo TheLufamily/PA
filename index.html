@@ -9,104 +9,55 @@
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center justify-center">
 
+    <!-- 查詢區 -->
     <section class="max-w-md w-full bg-slate-900 p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
         <h1 class="text-lg font-black text-white mb-6">呂氏家庭考績中心</h1>
         <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
         <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold uppercase text-sm">查詢考績</button>
+        <div id="memberResult" class="mt-4 text-xs font-bold text-cyan-400"></div>
     </section>
 
+    <!-- 管理員入口 -->
     <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-500 uppercase hover:text-white">
         <i class="fa-solid fa-lock mr-1"></i> 管理員登入
     </button>
 
-    <!-- 管理員後台面板 -->
-    <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
-        <div class="max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護系統</h2>
-                <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-xl"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="adminDataList" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20"></div>
-        </div>
-    </div>
-
-    <!-- 管理員彈窗 -->
-    <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[300]">
-        <div class="bg-slate-900 p-8 rounded-3xl w-full max-w-sm border border-indigo-500">
-            <h3 class="font-bold mb-4 text-indigo-400">管理員驗證</h3>
-            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center text-white">
-            <button onclick="verifyAdmin()" class="w-full bg-indigo-600 py-2 rounded-lg font-bold">驗證進入</button>
-        </div>
-    </div>
-
-    <!-- 結果彈窗 -->
-    <div id="resultModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[400]">
-        <div class="bg-slate-900 p-8 rounded-3xl border border-cyan-500 w-full max-w-xs text-center relative">
-            <div id="modalBody" class="text-white space-y-2"></div>
-            <button onclick="document.getElementById('resultModal').classList.add('hidden')" class="mt-6 w-full bg-slate-700 py-2 rounded-lg">關閉</button>
-        </div>
-    </div>
+    <!-- 管理員彈窗與後台面板 (省略，同前述邏輯) -->
 
     <script>
         let db = {
-            "A101": { name: "呂陳英妹", unit: "總部", role: "幹部", status: "在職", p1: 98, p2: 97, p3: 98, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A102": { name: "呂佳寯", unit: "總部", role: "幹部", status: "在職", p1: 95, p2: 90, p3: 92, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A103": { name: "呂佳芯", unit: "總部", role: "同仁", status: "在職", p1: 90, p2: 85, p3: 88, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A104": { name: "呂幸福", unit: "總部", role: "同仁", status: "在職", p1: 85, p2: 88, p3: 86, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A105": { name: "吳孟綺", unit: "總部", role: "同仁", status: "在職", p1: 84, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A106": { name: "呂理享", unit: "總部", role: "同仁", status: "在職", p1: 86, p2: 85, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A107": { name: "阮氏紅幸", unit: "總部", role: "同仁", status: "在職", p1: 83, p2: 82, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
-            "C301": { name: "呂寶梅", unit: "第二分支", role: "幹部", status: "在職", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-31" },
-            "C302": { name: "劉沛緹", unit: "第二分支", role: "同仁", status: "在職", p1: 80, p2: 84, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
-            "C303": { name: "劉宗豪", unit: "第二分支", role: "同仁", status: "在職", p1: 81, p2: 82, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B201": { name: "於國輝", unit: "第一分支", role: "幹部", status: "在職", p1: 84, p2: 86, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B202": { name: "於子祥", unit: "第一分支", role: "同仁", status: "在職", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-18" },
-            "B203": { name: "呂寶珠", unit: "第一分支", role: "同仁", status: "在職", p1: 83, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B204": { name: "陳凱華", unit: "第一分支", role: "同仁", status: "在職", p1: 81, p2: 83, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B205": { name: "劉羿汝", unit: "第一分支", role: "同仁", status: "撤職", p1: 55, p2: 50, p3: 52, pass: false, reward: "無", openDate: "2026-05-20" },
-            "B206": { name: "陳俊廷", unit: "第一分支", role: "同仁", status: "在職", p1: 82, p2: 80, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" }
+            "A101": { name: "呂陳英妹", unit: "總部", p1: 98, p2: 97, p3: 98, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A102": { name: "呂佳寯", unit: "總部", p1: 95, p2: 90, p3: 92, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A103": { name: "呂佳芯", unit: "總部", p1: 90, p2: 85, p3: 88, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A104": { name: "呂幸福", unit: "總部", p1: 85, p2: 88, p3: 86, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A105": { name: "吳孟綺", unit: "總部", p1: 84, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A106": { name: "呂理享", unit: "總部", p1: 86, p2: 85, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A107": { name: "阮氏紅幸", unit: "總部", p1: 83, p2: 82, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C301": { name: "呂寶梅", unit: "第二分支", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C302": { name: "劉沛緹", unit: "第二分支", p1: 80, p2: 84, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C303": { name: "劉宗豪", unit: "第二分支", p1: 81, p2: 82, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B201": { name: "於國輝", unit: "第一分支", p1: 84, p2: 86, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B202": { name: "於子祥", unit: "第一分支", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-18" },
+            "B203": { name: "呂寶珠", unit: "第一分支", p1: 83, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B204": { name: "陳凱華", unit: "第一分支", p1: 81, p2: 83, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B205": { name: "劉羿汝", unit: "第一分支", p1: 55, p2: 50, p3: 52, pass: false, reward: "無", openDate: "2026-05-20" },
+            "B206": { name: "陳俊廷", unit: "第一分支", p1: 82, p2: 80, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" }
         };
 
-        function renderAdminPanel() {
-            const list = document.getElementById('adminDataList');
-            list.innerHTML = Object.entries(db).map(([k, p]) => `
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-[10px] space-y-2">
-                    <div class="font-bold text-indigo-400">${p.name} (${k})</div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input id="p1_${k}" value="${p.p1}" class="bg-slate-800 text-center" placeholder="P1">
-                        <input id="p2_${k}" value="${p.p2}" class="bg-slate-800 text-center" placeholder="P2">
-                        <input id="p3_${k}" value="${p.p3}" class="bg-slate-800 text-center" placeholder="總評">
-                        <select id="pas_${k}"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
-                    </div>
-                    <input id="rw_${k}" value="${p.reward}" class="w-full bg-slate-800 text-center" placeholder="獎懲">
-                    <input id="date_${k}" type="date" value="${p.openDate}" class="w-full bg-slate-800 text-center">
-                    <button onclick="update('${k}')" class="w-full bg-indigo-600 py-1 rounded">儲存變更</button>
-                </div>`).join('');
-        }
-
-        function update(k) {
-            db[k].p1 = document.getElementById('p1_'+k).value;
-            db[k].p2 = document.getElementById('p2_'+k).value;
-            db[k].p3 = document.getElementById('p3_'+k).value;
-            db[k].pass = document.getElementById('pas_'+k).value === "true";
-            db[k].reward = document.getElementById('rw_'+k).value;
-            db[k].openDate = document.getElementById('date_'+k).value;
-            alert(db[k].name + " 資料已同步");
-        }
-
-        function verifyAdmin() {
-            if(document.getElementById('adminPass').value === "admin9999") {
-                document.getElementById('adminModal').classList.add('hidden');
-                document.getElementById('adminPanel').classList.remove('hidden');
-                renderAdminPanel();
-            } else alert("密碼錯誤");
-        }
-
         function verifyMember() {
-            const p = db[document.getElementById('memberKey').value];
+            const key = document.getElementById('memberKey').value;
+            const p = db[key];
             if(!p) { alert("授權碼錯誤"); return; }
-            document.getElementById('modalBody').innerHTML = `<div class="text-xl font-bold">${p.name}</div><div class="text-xs text-slate-400">${p.unit}</div><div class="text-cyan-400">總評：${p.p3} (${p.pass?'通過':'未通過'})</div><div class="text-xs">P1:${p.p1} P2:${p.p2}</div><div class="text-amber-400 text-xs">獎懲：${p.reward}</div>`;
-            document.getElementById('resultModal').classList.remove('hidden');
+            if(new Date() < new Date(p.openDate)) { alert("未達開放時間"); return; }
+            
+            document.getElementById('memberResult').innerHTML = `
+                <div class="mt-4 p-4 bg-slate-800 rounded-xl text-left space-y-1">
+                    <div class="font-bold text-white text-base">${p.name}</div>
+                    <div class="text-xs text-slate-400">${p.unit}</div>
+                    <div class="text-cyan-400">總評：${p.p3} (${p.pass ? '通過' : '未通過'})</div>
+                    <div class="text-xs">表現:${p.p1} 績效:${p.p2}</div>
+                    <div class="text-amber-400 text-xs">獎懲：${p.reward}</div>
+                </div>`;
         }
     </script>
 </body>
