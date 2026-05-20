@@ -9,6 +9,7 @@
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center justify-center">
 
+    <!-- 查詢區 -->
     <section class="max-w-md w-full bg-slate-900 p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
         <h1 class="text-lg font-black text-white mb-6">呂氏家庭考績中心</h1>
         <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
@@ -23,7 +24,7 @@
     <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
         <div class="max-w-4xl mx-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護 (16人)</h2>
+                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護 (含狀態控制)</h2>
                 <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="adminDataList" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20"></div>
@@ -50,22 +51,22 @@
     <script>
         const rewardOptions = ['無', '警告', '小過', '嘉獎', '小功', '大功'];
         let db = {
-            "A101": { name: "呂陳英妹", unit: "總部", role: "幹部", status: "在職", p1: 98, p2: 97, p3: 98, reward: "無", openDate: "2026-05-31" },
-            "A102": { name: "呂佳寯", unit: "總部", role: "幹部", status: "在職", p1: 95, p2: 90, p3: 92, reward: "無", openDate: "2026-05-31" },
-            "A103": { name: "呂佳芯", unit: "總部", role: "同仁", status: "在職", p1: 90, p2: 85, p3: 88, reward: "無", openDate: "2026-05-31" },
-            "A104": { name: "呂幸福", unit: "總部", role: "同仁", status: "在職", p1: 85, p2: 88, p3: 86, reward: "無", openDate: "2026-05-31" },
-            "A105": { name: "吳孟綺", unit: "總部", role: "同仁", status: "在職", p1: 84, p2: 87, p3: 85, reward: "無", openDate: "2026-05-31" },
-            "A106": { name: "呂理享", unit: "總部", role: "同仁", status: "在職", p1: 86, p2: 85, p3: 85, reward: "無", openDate: "2026-05-31" },
-            "A107": { name: "阮氏紅幸", unit: "總部", role: "同仁", status: "在職", p1: 83, p2: 82, p3: 82, reward: "無", openDate: "2026-05-31" },
-            "C301": { name: "呂寶梅", unit: "第二分支", role: "幹部", status: "在職", p1: 82, p2: 85, p3: 83, reward: "無", openDate: "2026-05-31" },
-            "C302": { name: "劉沛緹", unit: "第二分支", role: "同仁", status: "在職", p1: 80, p2: 84, p3: 82, reward: "無", openDate: "2026-05-31" },
-            "C303": { name: "劉宗豪", unit: "第二分支", role: "同仁", status: "在職", p1: 81, p2: 82, p3: 81, reward: "無", openDate: "2026-05-31" },
-            "B201": { name: "於國輝", unit: "第一分支", role: "幹部", status: "在職", p1: 84, p2: 86, p3: 85, reward: "無", openDate: "2026-05-31" },
-            "B202": { name: "於子祥", unit: "第一分支", role: "同仁", status: "在職", p1: 82, p2: 85, p3: 83, reward: "無", openDate: "2026-05-18" },
-            "B203": { name: "呂寶珠", unit: "第一分支", role: "同仁", status: "在職", p1: 83, p2: 87, p3: 85, reward: "無", openDate: "2026-05-31" },
-            "B204": { name: "陳凱華", unit: "第一分支", role: "同仁", status: "在職", p1: 81, p2: 83, p3: 82, reward: "無", openDate: "2026-05-31" },
-            "B205": { name: "劉羿汝", unit: "第一分支", role: "同仁", status: "撤職", p1: 55, p2: 50, p3: 52, reward: "無", openDate: "2026-05-20" },
-            "B206": { name: "陳俊廷", unit: "第一分支", role: "同仁", status: "在職", p1: 82, p2: 80, p3: 81, reward: "無", openDate: "2026-05-31" }
+            "A101": { name: "呂陳英妹", unit: "總部", role: "幹部", status: "在職", p1: 98, p2: 97, p3: 98, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A102": { name: "呂佳寯", unit: "總部", role: "幹部", status: "在職", p1: 95, p2: 90, p3: 92, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A103": { name: "呂佳芯", unit: "總部", role: "同仁", status: "在職", p1: 90, p2: 85, p3: 88, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A104": { name: "呂幸福", unit: "總部", role: "同仁", status: "在職", p1: 85, p2: 88, p3: 86, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A105": { name: "吳孟綺", unit: "總部", role: "同仁", status: "在職", p1: 84, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A106": { name: "呂理享", unit: "總部", role: "同仁", status: "在職", p1: 86, p2: 85, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A107": { name: "阮氏紅幸", unit: "總部", role: "同仁", status: "在職", p1: 83, p2: 82, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C301": { name: "呂寶梅", unit: "第二分支", role: "幹部", status: "在職", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C302": { name: "劉沛緹", unit: "第二分支", role: "同仁", status: "在職", p1: 80, p2: 84, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C303": { name: "劉宗豪", unit: "第二分支", role: "同仁", status: "在職", p1: 81, p2: 82, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B201": { name: "於國輝", unit: "第一分支", role: "幹部", status: "在職", p1: 84, p2: 86, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B202": { name: "於子祥", unit: "第一分支", role: "同仁", status: "在職", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-18" },
+            "B203": { name: "呂寶珠", unit: "第一分支", role: "同仁", status: "在職", p1: 83, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B204": { name: "陳凱華", unit: "第一分支", role: "同仁", status: "在職", p1: 81, p2: 83, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B205": { name: "劉羿汝", unit: "第一分支", role: "同仁", status: "撤職", p1: 55, p2: 50, p3: 52, pass: false, reward: "無", openDate: "2026-05-20" },
+            "B206": { name: "陳俊廷", unit: "第一分支", role: "同仁", status: "在職", p1: 82, p2: 80, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" }
         };
 
         function getGrade(s) { return s >= 90 ? "優秀" : s >= 80 ? "甲等" : s >= 70 ? "乙等" : "丁等"; }
@@ -84,7 +85,10 @@
                         <input id="p2_${k}" value="${p.p2}" class="bg-slate-800 text-center" placeholder="P2">
                         <input id="p3_${k}" value="${p.p3}" class="bg-slate-800 text-center" placeholder="P3">
                     </div>
-                    <select id="rw_${k}" class="w-full bg-slate-800">${rewardOptions.map(r => `<option ${p.reward==r?'selected':''}>${r}</option>`).join('')}</select>
+                    <div class="grid grid-cols-2 gap-1">
+                        <select id="rw_${k}" class="bg-slate-800">${rewardOptions.map(r => `<option ${p.reward==r?'selected':''}>${r}</option>`).join('')}</select>
+                        <select id="pas_${k}" class="bg-slate-800"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
+                    </div>
                     <input id="date_${k}" type="date" value="${p.openDate}" class="w-full bg-slate-800 text-center">
                     <button onclick="update('${k}')" class="w-full bg-indigo-600 py-1 rounded font-bold">儲存更新</button>
                 </div>`).join('');
@@ -97,6 +101,7 @@
             db[k].p2 = document.getElementById('p2_'+k).value;
             db[k].p3 = document.getElementById('p3_'+k).value;
             db[k].reward = document.getElementById('rw_'+k).value;
+            db[k].pass = document.getElementById('pas_'+k).value === "true";
             db[k].openDate = document.getElementById('date_'+k).value;
             alert(db[k].name + " 已更新");
         }
@@ -107,8 +112,9 @@
             if(new Date() < new Date(p.openDate)) { alert("未達開放時間"); return; }
             document.getElementById('modalBody').innerHTML = `
                 <div class="text-xl font-bold">${p.name} (${p.role})</div>
-                <div class="text-cyan-400 font-bold">評等：${getGrade(p.p3)}</div>
-                <div class="text-sm">分數：${p.p3} | 獎懲：${p.reward}</div>`;
+                <div class="text-cyan-400 font-bold">評等：${getGrade(p.p3)} (分數：${p.p3})</div>
+                <div class="${p.pass ? 'text-emerald-400' : 'text-red-400'} font-bold">${p.pass ? '考核通過' : '考核未通過'}</div>
+                <div class="text-xs text-slate-400">狀態：${p.status} | 獎懲：${p.reward}</div>`;
             document.getElementById('resultModal').classList.remove('hidden');
         }
 
