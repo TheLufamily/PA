@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>呂氏家庭生活資訊網 3.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=400;500;700;900&family=Orbitron:wght=400;700;900&display=swap');
+    body { font-family: "Noto Sans TC", sans-serif; background: #f8fafc; scroll-behavior: smooth; overflow-x: hidden; }
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    .tech-welcome-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, #0f111a 0%, #05060b 100%); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.6s; }
+    .member-tech-card { background: #161923; border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; transition: all 0.3s; }
+  </style>
+</head>
+
+<body class="text-slate-700 text-xs sm:text-sm md:text-base pb-[55px]">
+
+  <div id="welcomeOverlay" class="tech-welcome-overlay">
+    <div class="tech-hud-center-console max-w-lg w-[92%] p-10 text-center font-mono">
+      <h1 class="text-2xl font-black text-[#00f2fe] mb-6">呂氏家庭系統</h1>
+      <button onclick="dismissWelcome()" class="tech-btn px-10 py-3 rounded-xl font-bold">進入主系統</button>
+    </div>
+  </div>
+
+  <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center">
+      <h1 class="font-bold text-slate-800 text-xs md:text-sm">呂氏家庭生活資訊網 3.0</h1>
+      <div class="flex gap-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+        <a href="#home">首頁</a>
+        <a href="#performance" class="text-pink-600">考績查詢</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    
+    <section id="performance" class="py-16 bg-slate-900 text-white">
+      <div class="max-w-md mx-auto px-6">
+        <div class="bg-slate-800 p-8 rounded-3xl border border-indigo-500 shadow-2xl">
+          <h2 class="text-xl font-black text-[#00f2fe] mb-6 flex items-center gap-2">
+            <i class="fa-solid fa-user-shield"></i> 個人成績考核查詢
+          </h2>
+          <input type="password" id="memberKey" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mb-4 text-white" placeholder="請輸入授權碼...">
+          <button onclick="checkData()" class="w-full bg-indigo-600 font-bold py-3 rounded-xl hover:bg-indigo-700 transition-all">執行驗證</button>
+          <div id="resultOutput" class="mt-6 p-4 bg-slate-950 rounded-xl hidden border border-slate-700"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // 考績資料庫
+    const db = {
+      "妹555": { name: "呂陳英妹", score: "卓越特優(A++)", unit: "總部" },
+      "寯202": { name: "呂佳寯", score: "卓越特優(A+)", unit: "總部" },
+      "芯821": { name: "呂佳芯", score: "優等(A)", unit: "總部" },
+      "福777": { name: "呂幸福", score: "優等(A)", unit: "總部" },
+      "綺111": { name: "吳孟綺", score: "優等(A)", unit: "總部" },
+      "享123": { name: "呂理享", score: "優等(A)", unit: "總部" },
+      "幸001": { name: "阮氏紅幸", score: "優等(A)", unit: "總部" },
+      "梅666": { name: "呂寶梅", score: "優等(A)", unit: "第二分支" },
+      "緹999": { name: "劉沛緹", score: "優等(A)", unit: "第二分支" },
+      "豪888": { name: "劉宗豪", score: "優等(A)", unit: "第二分支" },
+      "輝321": { name: "于國輝", score: "優等(A)", unit: "第一分支" },
+      "祥520": { name: "于子祥", score: "優等(A)", unit: "第一分支" },
+      "珠889": { name: "呂寶珠", score: "優等(A)", unit: "第一分支" },
+      "華711": { name: "陳凱華", score: "優等(A)", unit: "第一分支" },
+      "汝101": { name: "劉羿汝", score: "優等(A)", unit: "第一分支" },
+      "廷991": { name: "陳俊廷", score: "優等(A)", unit: "第一分支" }
+    };
+
+    function checkData() {
+      const code = document.getElementById('memberKey').value.trim();
+      const output = document.getElementById('resultOutput');
+      output.classList.remove('hidden');
+      
+      if (code === "admin999") {
+        output.innerHTML = `<p class="text-red-400 font-bold mb-2">管理員存取：</p><div class="max-h-40 overflow-y-auto">${Object.values(db).map(p => `<p class="text-xs py-1 border-b border-slate-800">${p.name}: ${p.score}</p>`).join('')}</div>`;
+      } else if (db[code]) {
+        output.innerHTML = `<p class="text-lg font-bold">${db[code].name}</p><p>單位：${db[code].unit}</p><p class="text-[#00f2fe] font-bold text-xl">考績：${db[code].score}</p>`;
+      } else {
+        output.innerHTML = `<p class="text-pink-500 font-bold">授權碼錯誤或無權限。</p>`;
+      }
+    }
+
+    // 這裡保留您原本網站的所有 JS 函數 (dismissWelcome, switchTab, 等...)
+    function dismissWelcome() {
+      const overlay = document.getElementById('welcomeOverlay');
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.style.display = 'none', 600);
+    }
+  </script>
+</body>
+</html>
