@@ -5,26 +5,35 @@
     <title>呂氏家庭考績中心 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body { background: #020617; color: #f8fafc; font-family: sans-serif; }
+        .hex-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0, 242, 254, 0.2); }
+    </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen p-4 flex flex-col items-center justify-center">
 
     <!-- 查詢區 -->
-    <section class="max-w-md w-full bg-slate-900 p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
-        <h1 class="text-xl font-black mb-6">呂氏家庭考績中心</h1>
-        <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." class="w-full bg-slate-800 p-4 rounded-xl mb-4 text-center">
-        <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold">查詢考績</button>
+    <section class="max-w-md w-full hex-card p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
+        <h1 class="text-lg font-black text-white tracking-widest mb-6">呂氏家庭考績中心</h1>
+        <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." onkeydown="if(event.keyCode==13) verifyMember()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
+        <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold uppercase tracking-widest text-sm">查詢考績</button>
+        
+        <div class="mt-6 pt-6 border-t border-slate-800">
+            <input type="text" id="nameInput" placeholder="輸入姓名查詢授權碼" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-2">
+            <button onclick="showSecurityWarning()" class="w-full bg-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-slate-700">查詢授權碼</button>
+        </div>
     </section>
 
     <!-- 管理員入口 -->
-    <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-xs text-slate-500 uppercase tracking-widest hover:text-white">
+    <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-600 hover:text-white uppercase tracking-widest">
         <i class="fa-solid fa-lock mr-1"></i> 管理員登入
     </button>
 
-    <!-- 管理員驗證彈窗 -->
+    <!-- 管理員驗證 -->
     <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 p-8 rounded-3xl w-full max-w-sm border border-indigo-500">
-            <h3 class="font-bold mb-4">管理員驗證</h3>
-            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center">
+            <h3 class="font-bold mb-4 text-center">後台管理驗證</h3>
+            <input type="password" id="adminPass" placeholder="輸入管理密碼..." onkeydown="if(event.keyCode==13) verifyAdmin()" class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center">
             <div class="flex gap-2">
                 <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="flex-1 bg-slate-700 py-2 rounded-lg text-xs">取消</button>
                 <button onclick="verifyAdmin()" class="flex-1 bg-indigo-600 py-2 rounded-lg text-xs font-bold">驗證進入</button>
@@ -43,8 +52,26 @@
         </div>
     </div>
 
+    <!-- 彈窗組件 -->
+    <div id="resultModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[200]">
+        <div class="bg-slate-900 p-8 rounded-3xl border border-cyan-500 w-full max-w-xs text-center relative">
+            <button onclick="document.getElementById('resultModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
+            <div id="modalBody" class="text-white space-y-3"></div>
+            <div class="mt-6 pt-4 border-t border-slate-700 text-[10px] text-slate-500">簽核單位：呂氏家庭</div>
+        </div>
+    </div>
+
+    <div id="securityModal" class="fixed inset-0 bg-red-950/90 hidden flex items-center justify-center p-4 z-[100]">
+        <div class="bg-slate-950 p-6 rounded-2xl border border-red-500 max-w-sm w-full text-center">
+            <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4"></i>
+            <h3 class="text-red-500 font-bold mb-2">系統安全警告</h3>
+            <p class="text-white text-xs mb-6">嚴禁洩漏授權碼，系統已記錄本次行為。</p>
+            <button onclick="findKey()" class="w-full bg-red-600 py-2 rounded-lg text-xs font-bold">確認繼續</button>
+        </div>
+    </div>
+
     <script>
-        const membersDatabase = {
+        let membersDatabase = {
             "A101": { name: "呂陳英妹", unit: "總部", p3: 98, pass: true, reward: "無" },
             "A102": { name: "呂佳寯", unit: "總部", p3: 92, pass: true, reward: "無" },
             "A103": { name: "呂佳芯", unit: "總部", p3: 88, pass: true, reward: "無" },
@@ -63,28 +90,38 @@
             "B206": { name: "陳俊廷", unit: "第一分支", p3: 81, pass: true, reward: "無" }
         };
 
-        function verifyAdmin() {
-            if (document.getElementById('adminPass').value === "admin9999") {
-                document.getElementById('adminModal').classList.add('hidden');
-                document.getElementById('adminPanel').classList.remove('hidden');
-                renderAdminPanel();
-            } else { alert("密碼錯誤"); }
-        }
+        function getGrade(s) { return s >= 90 ? "優秀" : s >= 80 ? "甲等" : s >= 70 ? "乙等" : "丁等"; }
 
         function renderAdminPanel() {
             const list = document.getElementById('adminDataList');
             list.innerHTML = Object.entries(membersDatabase).map(([key, p]) => `
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
-                    <div>${p.name} (${key}) - 總評: ${p.p3}</div>
-                    <button onclick="alert('請在程式碼內直接修改資料庫，目前為唯讀展示')" class="bg-indigo-600 px-3 py-1 rounded">檢視</button>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-xs">
+                    <div class="font-bold mb-2">${p.name} (${key})</div>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <input type="number" id="p3_${key}" value="${p.p3}" class="bg-slate-800 p-1 text-center" placeholder="總評">
+                        <select id="pas_${key}" class="bg-slate-800 p-1"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
+                    </div>
+                    <button onclick="update('${key}')" class="w-full bg-indigo-600 py-1 rounded">儲存更新</button>
                 </div>`).join('');
         }
 
+        function update(key) {
+            membersDatabase[key].p3 = parseInt(document.getElementById('p3_'+key).value);
+            membersDatabase[key].pass = document.getElementById('pas_'+key).value === "true";
+            alert(membersDatabase[key].name + " 資料已更新");
+            renderAdminPanel();
+        }
+
+        function verifyAdmin() { if (document.getElementById('adminPass').value === "admin9999") { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); renderAdminPanel(); } else { alert("密碼錯誤"); } }
+        function showSecurityWarning() { if(document.getElementById('nameInput').value.trim() !== "") document.getElementById('securityModal').classList.remove('hidden'); }
+        function findKey() { document.getElementById('securityModal').classList.add('hidden'); const name = document.getElementById('nameInput').value.trim(); const k = Object.keys(membersDatabase).find(k => membersDatabase[k].name === name); document.getElementById('quickResult').innerText = k ? `授權碼: ${k}` : "查無此人"; }
+        
         function verifyMember() {
-            const key = document.getElementById('memberKey').value;
-            const p = membersDatabase[key];
+            const p = membersDatabase[document.getElementById('memberKey').value];
             if(!p) { alert("授權碼錯誤"); return; }
-            alert(p.name + " 考核總評: " + p.p3 + (p.pass ? " (通過)" : " (未通過)"));
+            const isQualified = (p.p3 >= 70 && p.pass);
+            document.getElementById('modalBody').innerHTML = `<div class="text-2xl font-black">${p.name}</div><div class="text-cyan-400 font-bold">評等：${getGrade(p.p3)}</div><div class="font-bold ${isQualified?'text-emerald-400':'text-red-400'}">${isQualified?'✅ 考核通過':'❌ 考核未通過'}</div>`;
+            document.getElementById('resultModal').classList.remove('hidden');
         }
     </script>
 </body>
