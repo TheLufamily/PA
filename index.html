@@ -2,43 +2,63 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>呂氏家庭考績中心 3.0</title>
+    <title>呂氏家庭考績中心 3.0 (大整合最終版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>body { background: #020617; color: #f8fafc; font-family: sans-serif; }</style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center justify-center">
 
-    <!-- 查詢區 -->
+    <!-- 前台查詢區 -->
     <section class="max-w-md w-full bg-slate-900 p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
-        <h1 class="text-lg font-black text-white mb-6">呂氏家庭考績中心</h1>
-        <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
-        <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold uppercase text-sm">查詢考績</button>
+        <h1 class="text-lg font-black text-white mb-1">呂氏家庭考績中心</h1>
+        <p class="text-[10px] text-cyan-400 mb-6 uppercase tracking-widest">政戰幹部：呂佳寯 負責</p>
+        
+        <input type="password" id="memberKey" maxlength="4" placeholder="輸入四位數授權碼..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
+        <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold uppercase text-sm mb-6">查詢考績</button>
+        
+        <div class="pt-6 border-t border-slate-800">
+            <input type="text" id="nameInput" placeholder="輸入姓名查詢授權碼" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-2">
+            <button onclick="showSecurityWarning()" class="w-full bg-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-slate-700">查詢授權碼</button>
+            <div id="quickResult" class="mt-3 text-cyan-400 font-bold text-xs"></div>
+        </div>
     </section>
 
     <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-500 uppercase hover:text-white">
         <i class="fa-solid fa-lock mr-1"></i> 管理員登入
     </button>
 
-    <!-- 後台面板（列表模式） -->
+    <!-- 後台面板 (列表化) -->
     <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
         <div class="max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護系統</h2>
+                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護 (16人)</h2>
                 <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="adminDataList" class="space-y-2 pb-20">
-                <!-- 標題行 -->
-                <div class="grid grid-cols-10 gap-2 text-[10px] text-slate-400 uppercase px-2 mb-2">
-                    <div class="col-span-2">姓名</div><div>狀態</div><div>職稱</div><div>P1/P2/P3</div><div>獎懲</div><div>開放日</div><div>判定</div><div class="col-span-2">操作</div>
+                <div class="grid grid-cols-10 gap-2 text-[10px] text-slate-400 px-2 uppercase">
+                    <div class="col-span-2">姓名</div><div>狀態</div><div>職稱</div><div>P1/P2/P3</div><div>獎懲</div><div>開放日</div><div>判定</div><div>操作</div>
                 </div>
                 <div id="dataRows"></div>
             </div>
         </div>
     </div>
 
-    <!-- 管理員驗證與彈窗系統 (同前版本，省略顯示) -->
-    <!-- ... (管理員彈窗、驗證邏輯與結果彈窗代碼相同) ... -->
+    <!-- 驗證與彈窗系統 -->
+    <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[300]">
+        <div class="bg-slate-900 p-8 rounded-3xl w-full max-w-sm border border-indigo-500">
+            <h3 class="font-bold mb-4 text-indigo-400">管理員驗證</h3>
+            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center text-white">
+            <button onclick="verifyAdmin()" class="w-full bg-indigo-600 py-2 rounded-lg font-bold">驗證進入</button>
+        </div>
+    </div>
+
+    <div id="resultModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[400]">
+        <div class="bg-slate-900 p-8 rounded-3xl border border-cyan-500 w-full max-w-xs text-center relative">
+            <div id="modalBody" class="text-white space-y-2"></div>
+            <button onclick="document.getElementById('resultModal').classList.add('hidden')" class="mt-6 w-full bg-slate-700 py-2 rounded-lg">關閉</button>
+        </div>
+    </div>
 
     <script>
         const rewardOptions = ['無', '警告', '小過', '嘉獎', '小功', '大功'];
@@ -72,10 +92,32 @@
                     <select id="rw_${k}" class="bg-slate-800">${rewardOptions.map(r => `<option ${p.reward==r?'selected':''}>${r}</option>`).join('')}</select>
                     <input id="date_${k}" type="date" value="${p.openDate}" class="bg-slate-800">
                     <select id="pas_${k}" class="bg-slate-800"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
-                    <button onclick="update('${k}')" class="col-span-2 bg-indigo-600 py-1 rounded font-bold">儲存</button>
+                    <button onclick="update('${k}')" class="bg-indigo-600 py-1 rounded font-bold">儲存</button>
                 </div>`).join('');
         }
-        // ... (其他驗證與更新邏輯維持不變)
+
+        function update(k) {
+            db[k].status = document.getElementById('st_'+k).value;
+            db[k].role = document.getElementById('ro_'+k).value;
+            db[k].p1 = document.getElementById('p1_'+k).value;
+            db[k].p2 = document.getElementById('p2_'+k).value;
+            db[k].p3 = document.getElementById('p3_'+k).value;
+            db[k].reward = document.getElementById('rw_'+k).value;
+            db[k].pass = document.getElementById('pas_'+k).value === "true";
+            db[k].openDate = document.getElementById('date_'+k).value;
+            alert(db[k].name + " 更新成功");
+        }
+
+        function verifyMember() {
+            const p = db[document.getElementById('memberKey').value];
+            if(!p) { alert("授權碼錯誤"); return; }
+            if(new Date() < new Date(p.openDate)) { alert("未達開放時間"); return; }
+            document.getElementById('modalBody').innerHTML = `<div class="text-xl font-bold">${p.name}</div><div class="text-cyan-400 font-bold">總評：${p.p3}分</div><div class="${p.pass?'text-emerald-400':'text-red-400'} font-bold">${p.pass?'考核通過':'考核未通過'}</div><div class="text-xs text-slate-400">獎懲：${p.reward}</div>`;
+            document.getElementById('resultModal').classList.remove('hidden');
+        }
+
+        function showSecurityWarning() { if(document.getElementById('nameInput').value) document.getElementById('quickResult').innerText = "❌ 系統已記錄非法查詢行為"; }
+        function verifyAdmin() { if(document.getElementById('adminPass').value === "admin9999") { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); renderAdminPanel(); } else alert("密碼錯誤"); }
     </script>
 </body>
 </html>
