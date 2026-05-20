@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>呂氏家庭考績中心 - 查詢平台</title>
+    <title>呂氏家庭考績中心 - 考績查詢平臺</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
@@ -20,21 +20,6 @@
         </div>
     </div>
 
-    <section class="ui-box max-w-md w-full p-8 text-center shadow-2xl">
-        <h1 class="text-xl font-black mb-1 text-white">呂氏家庭考績中心</h1>
-        <p class="text-[10px] text-cyan-400 mb-6 uppercase tracking-widest">政戰幹部：呂佳寯 負責</p>
-        <div class="mb-4 p-3 border border-red-900 bg-red-950/30 rounded-xl">
-            <p class="text-[10px] text-red-400 font-bold uppercase"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 僅限本人授權碼查詢，嚴禁冒用與非法存取</p>
-        </div>
-        <input type="text" id="memberKey" placeholder="輸入授權碼..." class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
-        <button onclick="verifyMember()" class="w-full bg-[#0891b2] py-4 rounded-xl font-bold mb-4 text-white hover:bg-[#06748c]">查詢考績</button>
-        <input type="text" id="nameInput" placeholder="輸入姓名找回代碼" class="w-full bg-[#1e293b] border border-slate-700 rounded-lg px-4 py-3 mb-2 text-center text-sm text-white">
-        <button onclick="findKeyByName()" class="w-full bg-[#1e293b] py-3 rounded-lg text-xs font-bold hover:bg-slate-700 text-white mb-6">查詢專屬代碼</button>
-        <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="w-full bg-[#4f46e5] py-4 rounded-xl font-bold text-white hover:bg-[#4338ca] transition">
-            <i class="fa-solid fa-shield-halved mr-2"></i> 管理員登入
-        </button>
-    </section>
-
     <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-4">
@@ -48,51 +33,48 @@
         </div>
     </div>
 
-    <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[300]">
-        <div class="bg-[#0f172a] border border-[#312e81] p-8 rounded-[2rem] w-full max-w-sm text-center">
-            <h3 class="font-bold mb-6 text-white text-xl">管理員驗證</h3>
-            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-6 py-5 mb-6 text-center text-white">
-            <button onclick="verifyAdmin()" class="w-full bg-[#4f46e5] py-5 rounded-xl font-bold text-white hover:bg-[#4338ca]">驗證進入</button>
-        </div>
-    </div>
-
     <script>
-        const TODAY = "2026-05-20";
         let db = JSON.parse(localStorage.getItem('LyuFamilyDB')) || {
-            "A101": { name: "呂陳英妹", role: "幹部", status: "在職", p1: 98, p2: 97, p3: 98, pass: true, reward: "無", date: "2026-05-31" },
-            "A102": { name: "呂佳寯", role: "幹部", status: "在職", p1: 95, p2: 90, p3: 92, pass: true, reward: "無", date: "2026-05-31" },
-            "A103": { name: "呂佳芯", role: "同仁", status: "在職", p1: 90, p2: 85, p3: 88, pass: true, reward: "無", date: "2026-05-31" },
-            "A104": { name: "呂幸福", role: "同仁", status: "在職", p1: 85, p2: 88, p3: 86, pass: true, reward: "無", date: "2026-05-31" },
-            "A105": { name: "吳孟綺", role: "同仁", status: "在職", p1: 84, p2: 87, p3: 85, pass: true, reward: "無", date: "2026-05-31" },
-            "A106": { name: "呂理享", role: "同仁", status: "在職", p1: 86, p2: 85, p3: 85, pass: true, reward: "無", date: "2026-05-31" },
-            "A107": { name: "阮氏紅幸", role: "同仁", status: "在職", p1: 83, p2: 82, p3: 82, pass: true, reward: "無", date: "2026-05-31" },
-            "C301": { name: "呂寶梅", role: "幹部", status: "在職", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", date: "2026-05-31" },
-            "C302": { name: "劉沛緹", role: "同仁", status: "在職", p1: 80, p2: 84, p3: 82, pass: true, reward: "無", date: "2026-05-31" },
-            "C303": { name: "劉宗豪", role: "同仁", status: "在職", p1: 81, p2: 82, p3: 81, pass: true, reward: "無", date: "2026-05-31" },
-            "B201": { name: "于國輝", role: "幹部", status: "在職", p1: 84, p2: 86, p3: 85, pass: true, reward: "無", date: "2026-05-31" },
-            "B202": { name: "于子祥", role: "同仁", status: "在職", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", date: "2026-05-18" },
-            "B203": { name: "呂寶珠", role: "同仁", status: "在職", p1: 83, p2: 87, p3: 85, pass: true, reward: "無", date: "2026-05-31" },
-            "B204": { name: "陳凱華", role: "同仁", status: "在職", p1: 81, p2: 83, p3: 82, pass: true, reward: "無", date: "2026-05-31" },
-            "B205": { name: "劉羿汝", role: "同仁", status: "撤職", p1: 55, p2: 50, p3: 52, pass: false, reward: "無", date: "2026-05-20" },
-            "B206": { name: "陳俊廷", role: "同仁", status: "在職", p1: 82, p2: 80, p3: 81, pass: true, reward: "無", date: "2026-05-31" }
+            "A101": { name: "呂陳英妹", role: "幹部", status: "在職", p1: 98, p2: 97, p3: 98, reward: "無", pass: true, date: "2026-05-31" },
+            "A102": { name: "呂佳寯", role: "幹部", status: "在職", p1: 95, p2: 90, p3: 92, reward: "無", pass: true, date: "2026-05-31" },
+            "A103": { name: "呂佳芯", role: "同仁", status: "在職", p1: 90, p2: 85, p3: 88, reward: "無", pass: true, date: "2026-05-31" },
+            "A104": { name: "呂幸福", role: "同仁", status: "在職", p1: 85, p2: 88, p3: 86, reward: "無", pass: true, date: "2026-05-31" },
+            "A105": { name: "吳孟綺", role: "同仁", status: "在職", p1: 84, p2: 87, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
+            "A106": { name: "呂理享", role: "同仁", status: "在職", p1: 86, p2: 85, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
+            "A107": { name: "阮氏紅幸", role: "同仁", status: "在職", p1: 83, p2: 82, p3: 82, reward: "無", pass: true, date: "2026-05-31" },
+            "C301": { name: "呂寶梅", role: "幹部", status: "在職", p1: 82, p2: 85, p3: 83, reward: "無", pass: true, date: "2026-05-31" },
+            "C302": { name: "劉沛緹", role: "同仁", status: "在職", p1: 80, p2: 84, p3: 82, reward: "無", pass: true, date: "2026-05-31" },
+            "C303": { name: "劉宗豪", role: "同仁", status: "在職", p1: 81, p2: 82, p3: 81, reward: "無", pass: true, date: "2026-05-31" },
+            "B201": { name: "于國輝", role: "幹部", status: "在職", p1: 84, p2: 86, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
+            "B202": { name: "于子祥", role: "同仁", status: "在職", p1: 82, p2: 85, p3: 83, reward: "無", pass: true, date: "2026-05-18" },
+            "B203": { name: "呂寶珠", role: "同仁", status: "在職", p1: 83, p2: 87, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
+            "B204": { name: "陳凱華", role: "同仁", status: "在職", p1: 81, p2: 83, p3: 82, reward: "無", pass: true, date: "2026-05-31" },
+            "B205": { name: "劉羿汝", role: "同仁", status: "撤職", p1: 55, p2: 50, p3: 52, reward: "無", pass: false, date: "2026-05-20" },
+            "B206": { name: "陳俊廷", role: "同仁", status: "在職", p1: 82, p2: 80, p3: 81, reward: "無", pass: true, date: "2026-05-31" }
         };
 
-        function showModal(t, b) { document.getElementById('modalTitle').innerText = t; document.getElementById('modalBody').innerHTML = b; document.getElementById('systemModal').classList.remove('hidden'); }
-        function verifyMember() { const p = db[document.getElementById('memberKey').value.trim()]; if(!p) showModal("錯誤", "授權碼無效"); else if(TODAY < p.date) showModal("系統訊息", "未開放查詢，開放日：" + p.date); else showModal("查詢結果", `姓名：${p.name}<br>總評：${p.p3}<br>狀態：${p.pass ? "考核通過" : "考核未通過"}`); }
-        function findKeyByName() { const val = document.getElementById('nameInput').value.trim(); const k = Object.keys(db).find(k => db[k].name === val); showModal("查詢結果", k ? "代碼: " + k : "查無此人"); }
-        function verifyAdmin() { if(document.getElementById('adminPass').value === "admin9999") { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); renderAdminPanel(); } else showModal("錯誤", "密碼錯誤"); }
-        function renderAdminPanel() { document.getElementById('dataRows').innerHTML = Object.entries(db).map(([k, p]) => `
-            <div class="grid grid-cols-[2fr,1fr,1fr,2fr,1fr,1.5fr,1fr] gap-2 items-center bg-slate-900 p-2 rounded text-sm text-white">
+        function getPassColor(val) { return val === 'true' ? 'text-emerald-400' : (val === 'false' ? 'text-red-400' : 'text-orange-400'); }
+
+        function renderAdminPanel() { 
+            document.getElementById('dataRows').innerHTML = Object.entries(db).map(([k, p]) => `
+            <div class="grid grid-cols-[1.5fr,1fr,1fr,2fr,1fr,1fr,1fr,0.5fr] gap-2 items-center bg-slate-900 p-2 rounded text-sm text-white">
                 <div class="truncate font-bold">${p.name} (${k})</div>
                 <select id="st_${k}" class="bg-slate-800 p-1 rounded">${['在職', '撤職'].map(s => `<option ${p.status==s?'selected':''}>${s}</option>`).join('')}</select>
                 <select id="ro_${k}" class="bg-slate-800 p-1 rounded">${['幹部', '同仁'].map(r => `<option ${p.role==r?'selected':''}>${r}</option>`).join('')}</select>
-                <div class="flex gap-1 items-center"><input id="p1_${k}" value="${p.p1}" class="w-8 bg-slate-800 text-center"><input id="p2_${k}" value="${p.p2}" class="w-8 bg-slate-800 text-center"><input id="p3_${k}" value="${p.p3}" class="w-8 bg-slate-800 text-center"><button onclick="resetScore('${k}')" class="bg-red-600 px-2 py-1 ml-2 rounded text-[8px] font-bold">歸零</button></div>
+                <div class="flex gap-1 items-center"><input id="p1_${k}" value="${p.p1}" class="w-8 bg-slate-800 text-center"><input id="p2_${k}" value="${p.p2}" class="w-8 bg-slate-800 text-center"><input id="p3_${k}" value="${p.p3}" class="w-8 bg-slate-800 text-center"><button onclick="resetScore('${k}')" class="bg-red-700 px-1 ml-1 rounded text-[8px]">歸零</button></div>
                 <select id="rw_${k}" class="bg-slate-800 p-1 rounded">${['無', '警告', '小過', '嘉獎', '小功', '大功'].map(r => `<option ${p.reward==r?'selected':''}>${r}</option>`).join('')}</select>
-                <input id="date_${k}" type="date" value="${p.date}" class="bg-slate-800 p-1 rounded text-white">
-                <select id="pas_${k}" onchange="this.className = 'bg-slate-800 p-1 rounded ' + (this.value === 'true' ? 'text-emerald-400' : 'text-red-400')" class="bg-slate-800 p-1 rounded ${p.pass ? 'text-emerald-400' : 'text-red-400'}"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
-            </div>`).join(''); }
-        function resetScore(k) { document.getElementById('p1_'+k).value=0; document.getElementById('p2_'+k).value=0; document.getElementById('p3_'+k).value=0; showModal("歸零", "分數已重置 (請記得點選一鍵儲存)"); }
-        function saveAll() { Object.keys(db).forEach(k => { db[k].status = document.getElementById('st_'+k).value; db[k].role = document.getElementById('ro_'+k).value; db[k].p1 = document.getElementById('p1_'+k).value; db[k].p2 = document.getElementById('p2_'+k).value; db[k].p3 = document.getElementById('p3_'+k).value; db[k].reward = document.getElementById('rw_'+k).value; db[k].pass = document.getElementById('pas_'+k).value === "true"; db[k].date = document.getElementById('date_'+k).value; }); localStorage.setItem('LyuFamilyDB', JSON.stringify(db)); showModal("系統", "所有資料已永久儲存至瀏覽器"); }
+                <input id="date_${k}" type="date" value="${p.date}" class="bg-slate-800 p-1 rounded">
+                <select id="pas_${k}" onchange="this.className='bg-slate-800 p-1 rounded '+getPassColor(this.value)" class="bg-slate-800 p-1 rounded ${getPassColor(String(p.pass))}">
+                    <option value="true" ${p.pass===true?'selected':''}>通過</option>
+                    <option value="false" ${p.pass===false?'selected':''}>未通過</option>
+                    <option value="pending" ${p.pass==='pending'?'selected':''}>考核中</option>
+                </select>
+            </div>`).join(''); 
+        }
+
+        function resetScore(k) { document.getElementById('p1_'+k).value=0; document.getElementById('p2_'+k).value=0; document.getElementById('p3_'+k).value=0; showModal("歸零", "分數已重置"); }
+        function saveAll() { Object.keys(db).forEach(k => { db[k].status = document.getElementById('st_'+k).value; db[k].role = document.getElementById('ro_'+k).value; db[k].p1 = document.getElementById('p1_'+k).value; db[k].p2 = document.getElementById('p2_'+k).value; db[k].p3 = document.getElementById('p3_'+k).value; db[k].reward = document.getElementById('rw_'+k).value; db[k].pass = document.getElementById('pas_'+k).value === "true" ? true : (document.getElementById('pas_'+k).value === "false" ? false : 'pending'); db[k].date = document.getElementById('date_'+k).value; }); localStorage.setItem('LyuFamilyDB', JSON.stringify(db)); showModal("系統", "資料已保存"); }
+        function showModal(t, b) { document.getElementById('modalTitle').innerText = t; document.getElementById('modalBody').innerHTML = b; document.getElementById('systemModal').classList.remove('hidden'); }
     </script>
 </body>
 </html>
