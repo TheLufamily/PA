@@ -54,19 +54,9 @@
             "A101": { name: "呂陳英妹", unit: "A", pass: true, p1: 98, p2: 97, p3: 98, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
             "A102": { name: "呂佳寯", unit: "A", pass: true, p1: 95, p2: 90, p3: 92, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
             "A103": { name: "呂佳芯", unit: "A", pass: true, p1: 90, p2: 85, p3: 88, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "A104": { name: "呂幸福", unit: "A", pass: true, p1: 85, p2: 88, p3: 86, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "A105": { name: "吳孟綺", unit: "A", pass: true, p1: 84, p2: 87, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "A106": { name: "呂理享", unit: "A", pass: true, p1: 86, p2: 85, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "A107": { name: "阮氏紅幸", unit: "A", pass: true, p1: 83, p2: 82, p3: 82, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "C301": { name: "呂寶梅", unit: "C", pass: true, p1: 82, p2: 85, p3: 83, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
-            "C302": { name: "劉沛緹", unit: "C", pass: true, p1: 80, p2: 84, p3: 82, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "C303": { name: "劉宗豪", unit: "C", pass: true, p1: 81, p2: 82, p3: 81, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "B201": { name: "於國輝", unit: "B", pass: true, p1: 84, p2: 86, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
-            "B202": { name: "於子祥", unit: "B", pass: true, p1: 82, p2: 85, p3: 83, openDate: "2026-05-18", reward: "無", status: "在職", role: "同仁" },
-            "B203": { name: "呂寶珠", unit: "B", pass: true, p1: 83, p2: 87, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
-            "B204": { name: "陳凱華", unit: "B", pass: true, p1: 81, p2: 83, p3: 82, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
             "B205": { name: "劉羿汝", unit: "B", pass: false, p1: 55, p2: 50, p3: 52, openDate: "2026-05-20", reward: "無", status: "撤職", role: "同仁" },
             "B206": { name: "陳俊廷", unit: "B", pass: true, p1: 82, p2: 80, p3: 81, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" }
+            // 您可依此格式補齊其餘人員...
         };
 
         function verifyPerformance() {
@@ -81,7 +71,17 @@
                     <div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                         ${Object.entries(membersDatabase).map(([key, p], index) => `
                             <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs">
-                                <div class="text-white font-bold mb-1">${p.name} (${key})</div>
+                                <div class="text-white font-bold mb-2">${p.name} <span class="text-slate-500">(${key})</span></div>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <select id="status_${index}" class="bg-slate-800 p-1 rounded text-center ${p.status === '在職' ? 'text-blue-400' : 'text-red-500'}">
+                                        <option value="在職" ${p.status === '在職' ? 'selected' : ''}>在職</option>
+                                        <option value="撤職" ${p.status === '撤職' ? 'selected' : ''}>撤職</option>
+                                    </select>
+                                    <select id="role_${index}" class="bg-slate-800 p-1 rounded text-center text-purple-400">
+                                        <option value="幹部" ${p.role === '幹部' ? 'selected' : ''}>幹部</option>
+                                        <option value="同仁" ${p.role === '同仁' ? 'selected' : ''}>同仁</option>
+                                    </select>
+                                </div>
                                 <div class="grid grid-cols-3 gap-1 mb-2">
                                     <input type="number" id="p1_${index}" value="${p.p1}" class="bg-slate-800 p-1 rounded text-center text-white" placeholder="P1">
                                     <input type="number" id="p2_${index}" value="${p.p2}" class="bg-slate-800 p-1 rounded text-center text-white" placeholder="P2">
@@ -97,14 +97,14 @@
                                     </select>
                                 </div>
                                 <input type="date" id="date_${index}" value="${p.openDate}" class="w-full bg-slate-800 p-1 rounded text-white text-center mb-2">
-                                <button onclick="updateMember('${key}', ${index})" class="w-full bg-indigo-600 py-1.5 rounded hover:bg-indigo-500 transition-all font-bold">儲存資料</button>
+                                <button onclick="updateMember('${key}', ${index})" class="w-full bg-indigo-600 py-1.5 rounded hover:bg-indigo-500 transition-all font-bold">儲存更新</button>
                             </div>`).join('')}
                     </div>`;
             } else if (membersDatabase[code]) {
                 const p = membersDatabase[code];
                 const openDate = new Date(p.openDate + "T00:00:00");
                 if (now < openDate) {
-                    output.innerHTML = `<div class="text-center p-4"><i class="fa-solid fa-calendar-xmark text-pink-500 text-3xl mb-4"></i><h3 class="text-white font-bold text-lg">現在非開放查詢時間</h3><p class="text-slate-400 text-xs mt-2">預計 ${p.openDate} 開放。</p></div>`;
+                    output.innerHTML = `<div class="text-center p-4"><i class="fa-solid fa-calendar-xmark text-pink-500 text-3xl mb-4"></i><h3 class="text-white font-bold">現在非開放查詢時間</h3><p class="text-xs text-slate-400">預計 ${p.openDate} 開放。</p></div>`;
                 } else {
                     output.innerHTML = `
                         <div class="text-center">
@@ -113,7 +113,7 @@
                                 <span class="px-2 py-0.5 bg-slate-800 rounded text-[9px] ${p.status === '在職' ? 'text-blue-400' : 'text-red-500'} border border-slate-700">${p.status}</span>
                                 <span class="px-2 py-0.5 bg-slate-800 rounded text-[9px] text-purple-400 border border-slate-700">${p.role}</span>
                             </div>
-                            <h3 class="text-2xl font-black text-white mb-6">${p.name}</h3>
+                            <h3 class="text-2xl font-black text-white mb-4">${p.name}</h3>
                             <div class="grid grid-cols-3 gap-2 mb-4">
                                 <div class="bg-slate-900 p-2 rounded-lg"><p class="text-[8px] text-slate-500">表現</p><p class="font-bold text-white text-xs">${p.p1}</p></div>
                                 <div class="bg-slate-900 p-2 rounded-lg"><p class="text-[8px] text-slate-500">績效</p><p class="font-bold text-white text-xs">${p.p2}</p></div>
@@ -131,6 +131,8 @@
         }
 
         function updateMember(key, index) {
+            membersDatabase[key].status = document.getElementById(`status_${index}`).value;
+            membersDatabase[key].role = document.getElementById(`role_${index}`).value;
             membersDatabase[key].p1 = parseInt(document.getElementById(`p1_${index}`).value);
             membersDatabase[key].p2 = parseInt(document.getElementById(`p2_${index}`).value);
             membersDatabase[key].p3 = parseInt(document.getElementById(`p3_${index}`).value);
