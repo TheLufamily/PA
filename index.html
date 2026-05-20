@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>呂氏家庭生活資訊網 3.0 - 年度考績</title>
+    <title>呂氏家庭生活資訊網 3.0 - 考績中心</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
@@ -20,7 +20,7 @@
     <section id="performance" class="max-w-md w-full">
         <div class="hex-card p-8 rounded-3xl border border-cyan-500/30 shadow-2xl">
             <h2 class="text-xl font-black text-cyan-400 mb-6 flex items-center gap-2">
-                <i class="fa-solid fa-user-shield"></i> 年度考績查詢 (數據矩陣)
+                <i class="fa-solid fa-user-shield"></i> 年度考績系統 (數據矩陣)
             </h2>
             
             <input type="password" id="memberKey" 
@@ -61,6 +61,9 @@
             const output = document.getElementById('resultOutput');
             output.classList.remove('hidden');
 
+            const unlockDate = new Date("2026-05-31T00:00:00");
+            const now = new Date();
+
             if (code === "admin999") {
                 output.innerHTML = `
                     <h3 class="text-indigo-400 font-bold mb-4 text-xs uppercase tracking-widest text-center">系統管理員：全家族績效一覽</h3>
@@ -70,6 +73,13 @@
                                 <span class="text-white">${p.name}</span>
                                 <span class="${p.pass ? 'text-emerald-400' : 'text-red-500'} font-bold">${p.pass ? '通過' : '未通過'}</span>
                             </div>`).join('')}
+                    </div>`;
+            } else if (now < unlockDate) {
+                output.innerHTML = `
+                    <div class="text-center p-4">
+                        <i class="fa-solid fa-lock text-pink-500 text-3xl mb-4"></i>
+                        <h3 class="text-white font-bold text-lg">系統鎖定中</h3>
+                        <p class="text-slate-400 text-xs mt-2">正式查詢時間為 2026-05-31</p>
                     </div>`;
             } else if (membersDatabase[code]) {
                 const p = membersDatabase[code];
@@ -95,7 +105,7 @@
                         <a href="#" class="block w-full py-3 bg-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-all">詳細考核報告</a>
                     </div>`;
             } else {
-                output.innerHTML = `<p class="text-pink-500 font-bold text-center text-xs">❌ 授權碼錯誤或無權限。</p>`;
+                output.innerHTML = `<p class="text-pink-500 font-bold text-center text-xs">❌ 授權碼錯誤。</p>`;
             }
         }
     </script>
