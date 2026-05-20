@@ -2,90 +2,89 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>呂氏家庭考績中心 3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        body { background: #020617; color: #f8fafc; font-family: sans-serif; }
-        .hex-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0, 242, 254, 0.2); }
-    </style>
 </head>
-<body class="min-h-screen p-4 flex flex-col items-center justify-center">
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- 一般查詢區 -->
-    <section id="memberSection" class="max-w-md w-full hex-card p-8 rounded-3xl border border-cyan-500/30 shadow-2xl">
-        <div class="text-center mb-6">
-            <h1 class="text-lg font-black text-white tracking-widest">呂氏家庭考績中心</h1>
-            <p class="text-[10px] text-cyan-400 mt-1 uppercase tracking-[0.2em]">政戰幹部：呂佳寯 負責</p>
-        </div>
-        
-        <div class="bg-indigo-900/30 p-4 rounded-xl border border-indigo-500/30 mb-6 text-center">
-            <p class="text-white text-xs mb-1">年度考核統一開放時間：<span class="text-emerald-400 font-bold">115/05/31</span></p>
-            <p class="text-[9px] text-slate-400 italic">(部分人員系統已提前開放)</p>
-        </div>
-
-        <input type="password" id="memberKey" maxlength="4" placeholder="輸入四位數授權碼..." onkeydown="if(event.keyCode==13) verifyMember()"
-               class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 text-white text-lg focus:border-cyan-500 outline-none mb-4 text-center">
-        <button onclick="verifyMember()" class="w-full bg-cyan-600 font-bold py-4 rounded-xl hover:bg-cyan-500 transition-all uppercase tracking-widest text-sm">查詢考績</button>
-        
-        <div class="mt-6 pt-6 border-t border-slate-800">
-            <p class="text-[10px] text-slate-500 text-center mb-2 uppercase">忘記授權碼？查詢專區</p>
-            <div class="flex gap-2">
-                <input type="text" id="nameInput" placeholder="輸入真實姓名" onkeydown="if(event.keyCode==13) showSecurityWarning()" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none">
-                <button onclick="showSecurityWarning()" class="bg-slate-800 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-700">查詢</button>
-            </div>
-            <div id="quickResult" class="mt-4 text-center text-cyan-400 font-bold text-xs"></div>
-        </div>
+    <!-- 查詢區 -->
+    <section class="max-w-md w-full bg-slate-900 p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
+        <h1 class="text-xl font-black mb-6">呂氏家庭考績中心</h1>
+        <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." class="w-full bg-slate-800 p-4 rounded-xl mb-4 text-center">
+        <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold">查詢考績</button>
     </section>
 
     <!-- 管理員入口 -->
-    <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-600 hover:text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-lock mr-1"></i> 管理員登入</button>
+    <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-xs text-slate-500 uppercase tracking-widest hover:text-white">
+        <i class="fa-solid fa-lock mr-1"></i> 管理員登入
+    </button>
 
-    <!-- 資料庫與核心邏輯 -->
+    <!-- 管理員驗證彈窗 -->
+    <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 p-8 rounded-3xl w-full max-w-sm border border-indigo-500">
+            <h3 class="font-bold mb-4">管理員驗證</h3>
+            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center">
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="flex-1 bg-slate-700 py-2 rounded-lg text-xs">取消</button>
+                <button onclick="verifyAdmin()" class="flex-1 bg-indigo-600 py-2 rounded-lg text-xs font-bold">驗證進入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理員後台面板 -->
+    <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-40">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護</h2>
+                <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="adminDataList" class="space-y-4 pb-20"></div>
+        </div>
+    </div>
+
     <script>
         const membersDatabase = {
-            "A101": { name: "呂陳英妹", unit: "總部", role: "幹部", p3: 98, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A102": { name: "呂佳寯", unit: "總部", role: "幹部", p3: 92, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A103": { name: "呂佳芯", unit: "總部", role: "同仁", p3: 88, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A104": { name: "呂幸福", unit: "總部", role: "同仁", p3: 86, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A105": { name: "吳孟綺", unit: "總部", role: "同仁", p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A106": { name: "呂理享", unit: "總部", role: "同仁", p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "A107": { name: "阮氏紅幸", unit: "總部", role: "同仁", p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
-            "C301": { name: "呂寶梅", unit: "第二分支", role: "幹部", p3: 83, pass: true, reward: "無", openDate: "2026-05-31" },
-            "C302": { name: "劉沛緹", unit: "第二分支", role: "同仁", p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
-            "C303": { name: "劉宗豪", unit: "第二分支", role: "同仁", p3: 81, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B201": { name: "于國輝", unit: "第一分支", role: "幹部", p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B202": { name: "于子祥", unit: "第一分支", role: "同仁", p3: 83, pass: true, reward: "無", openDate: "2026-05-18" },
-            "B203": { name: "呂寶珠", unit: "第一分支", role: "同仁", p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B204": { name: "陳凱華", unit: "第一分支", role: "同仁", p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
-            "B205": { name: "劉羿汝", unit: "第一分支", role: "同仁", p3: 52, pass: false, reward: "無", openDate: "2026-05-20" },
-            "B206": { name: "陳俊廷", unit: "第一分支", role: "同仁", p3: 81, pass: true, reward: "無", openDate: "2026-05-31" }
+            "A101": { name: "呂陳英妹", unit: "總部", p3: 98, pass: true, reward: "無" },
+            "A102": { name: "呂佳寯", unit: "總部", p3: 92, pass: true, reward: "無" },
+            "A103": { name: "呂佳芯", unit: "總部", p3: 88, pass: true, reward: "無" },
+            "A104": { name: "呂幸福", unit: "總部", p3: 86, pass: true, reward: "無" },
+            "A105": { name: "吳孟綺", unit: "總部", p3: 85, pass: true, reward: "無" },
+            "A106": { name: "呂理享", unit: "總部", p3: 85, pass: true, reward: "無" },
+            "A107": { name: "阮氏紅幸", unit: "總部", p3: 82, pass: true, reward: "無" },
+            "C301": { name: "呂寶梅", unit: "第二分支", p3: 83, pass: true, reward: "無" },
+            "C302": { name: "劉沛緹", unit: "第二分支", p3: 82, pass: true, reward: "無" },
+            "C303": { name: "劉宗豪", unit: "第二分支", p3: 81, pass: true, reward: "無" },
+            "B201": { name: "于國輝", unit: "第一分支", p3: 85, pass: true, reward: "無" },
+            "B202": { name: "于子祥", unit: "第一分支", p3: 83, pass: true, reward: "無" },
+            "B203": { name: "呂寶珠", unit: "第一分支", p3: 85, pass: true, reward: "無" },
+            "B204": { name: "陳凱華", unit: "第一分支", p3: 82, pass: true, reward: "無" },
+            "B205": { name: "劉羿汝", unit: "第一分支", p3: 52, pass: false, reward: "無" },
+            "B206": { name: "陳俊廷", unit: "第一分支", p3: 81, pass: true, reward: "無" }
         };
 
-        function getGrade(s) { return s >= 90 ? "優秀" : s >= 80 ? "甲等" : s >= 70 ? "乙等" : "丁等"; }
+        function verifyAdmin() {
+            if (document.getElementById('adminPass').value === "admin9999") {
+                document.getElementById('adminModal').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                renderAdminPanel();
+            } else { alert("密碼錯誤"); }
+        }
+
+        function renderAdminPanel() {
+            const list = document.getElementById('adminDataList');
+            list.innerHTML = Object.entries(membersDatabase).map(([key, p]) => `
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
+                    <div>${p.name} (${key}) - 總評: ${p.p3}</div>
+                    <button onclick="alert('請在程式碼內直接修改資料庫，目前為唯讀展示')" class="bg-indigo-600 px-3 py-1 rounded">檢視</button>
+                </div>`).join('');
+        }
 
         function verifyMember() {
-            const p = membersDatabase[document.getElementById('memberKey').value];
+            const key = document.getElementById('memberKey').value;
+            const p = membersDatabase[key];
             if(!p) { alert("授權碼錯誤"); return; }
-            if(new Date() < new Date(p.openDate)) { alert("未達開放時間"); return; }
-            
-            // 判定邏輯：評等需達乙等以上且後台通過才算通過
-            const isQualified = (p.p3 >= 70 && p.pass);
-            const statusText = isQualified ? "✅ 考核通過" : "❌ 考核未通過";
-            
-            document.body.insertAdjacentHTML('beforeend', `
-                <div id="resultModal" class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[200]">
-                    <div class="bg-slate-900 p-8 rounded-3xl border border-cyan-500 w-full max-w-xs text-center relative">
-                        <button onclick="this.parentElement.parentElement.remove()" class="absolute top-4 right-4 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
-                        <div class="text-2xl font-black mb-1">${p.name}</div>
-                        <div class="text-xs text-slate-400 mb-4">${p.unit} | ${p.role}</div>
-                        <div class="text-cyan-400 text-xl font-bold mb-2">等級：${getGrade(p.p3)}</div>
-                        <div class="font-bold mb-4 ${isQualified ? 'text-emerald-400' : 'text-red-400'}">${statusText}</div>
-                        <div class="text-amber-400 text-xs mb-6">獎懲紀錄：${p.reward}</div>
-                        <div class="pt-4 border-t border-slate-700 text-[10px] text-slate-500">簽核單位：呂氏家庭</div>
-                    </div>
-                </div>`);
+            alert(p.name + " 考核總評: " + p.p3 + (p.pass ? " (通過)" : " (未通過)"));
         }
     </script>
 </body>
