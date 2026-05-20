@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>呂氏家庭-考績查詢平台</title>
+    <title>呂氏考績中心 - 持久保存版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
@@ -14,7 +14,7 @@
 
     <div id="systemModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-[1000] p-4">
         <div class="bg-[#0f172a] border border-indigo-500 p-8 rounded-3xl w-full max-w-sm text-center shadow-2xl">
-            <div id="modalTitle" class="text-lg font-bold text-white mb-4">系統提示</div>
+            <div id="modalTitle" class="text-lg font-bold text-white mb-4 uppercase">系統提示</div>
             <div id="modalBody" class="text-sm text-slate-300 mb-6"></div>
             <button onclick="document.getElementById('systemModal').classList.add('hidden')" class="w-full bg-[#4f46e5] py-3 rounded-lg font-bold text-white">確認</button>
         </div>
@@ -22,7 +22,7 @@
 
     <section class="ui-box max-w-md w-full p-8 text-center shadow-2xl">
         <h1 class="text-xl font-black mb-1 text-white">呂氏家庭考績中心</h1>
-        <p class="text-[10px] text-cyan-400 mb-6 uppercase tracking-widest">目前系統鎖定：2026/05/31 開放</p>
+        <p class="text-[10px] text-cyan-400 mb-6 uppercase tracking-widest">系統自動保存已啟用</p>
         <input type="text" id="memberKey" placeholder="輸入授權碼..." class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
         <button onclick="verifyMember()" class="w-full bg-[#0891b2] py-4 rounded-xl font-bold mb-4 text-white hover:bg-[#06748c]">查詢考績</button>
         <input type="text" id="nameInput" placeholder="輸入姓名找回代碼" class="w-full bg-[#1e293b] border border-slate-700 rounded-lg px-4 py-3 mb-2 text-center text-sm text-white">
@@ -33,10 +33,9 @@
     </section>
 
     <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between mb-2"><h2 class="text-indigo-400 font-bold text-2xl">資料維護系統</h2><button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-white text-2xl">✕</button></div>
+        <div class="max-w-7xl mx-auto"><div class="flex justify-between mb-2"><h2 class="text-indigo-400 font-bold text-2xl">資料維護系統 (已啟動自動保存)</h2><button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-white text-2xl">✕</button></div>
             <div class="bg-indigo-950/30 p-3 rounded-lg text-[10px] text-indigo-200 grid grid-cols-[2fr,1fr,1fr,1.5fr,1fr,1.5fr,1fr,1fr] gap-2 mb-2 font-bold uppercase">
-                <div>成員姓名 (代碼)</div><div>職位狀態</div><div>身分職稱</div><div>分數設定 (P1/P2/P3)</div><div>獎懲記錄</div><div>開放查詢日期</div><div>考核結果</div><div>執行動作</div>
+                <div>成員姓名 (代碼)</div><div>職位狀態</div><div>身分職稱</div><div>分數 (P1/P2/P3)</div><div>獎懲</div><div>開放日期</div><div>考核結果</div><div>儲存</div>
             </div>
             <div id="dataRows" class="space-y-2"></div>
         </div>
@@ -71,6 +70,10 @@
             "B206": { name: "陳俊廷", role: "同仁", status: "在職", p1: 82, p2: 80, p3: 81, pass: true, reward: "無", date: "2026-05-31" }
         };
 
+        // 初始化：讀取硬碟中的資料
+        const savedData = localStorage.getItem('LyuFamilyDB');
+        if(savedData) db = JSON.parse(savedData);
+
         function showModal(t, b) { document.getElementById('modalTitle').innerText = t; document.getElementById('modalBody').innerHTML = b; document.getElementById('systemModal').classList.remove('hidden'); }
         function verifyMember() { const p = db[document.getElementById('memberKey').value.trim()]; if(!p) showModal("錯誤", "授權碼無效"); else if(TODAY < p.date) showModal("尚未開放", "系統預設 2026/05/31 開放查詢。"); else showModal("考績結果", `姓名：${p.name}<br>總評：${p.p3}<br>狀態：${p.pass ? "考核通過" : "考核未通過"}`); }
         function findKeyByName() { const k = Object.keys(db).find(k => db[k].name === document.getElementById('nameInput').value.trim()); showModal("查詢結果", k ? "代碼: " + k : "查無此人"); }
@@ -86,7 +89,7 @@
                 <select id="pas_${k}" class="bg-slate-800 p-1 rounded ${p.pass ? 'text-emerald-400' : 'text-red-400'}"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
                 <button class="bg-indigo-600 px-4 py-1 rounded font-bold hover:bg-indigo-500" onclick="update('${k}')">儲存</button>
             </div>`).join(''); }
-        function update(k) { db[k].status = document.getElementById('st_'+k).value; db[k].role = document.getElementById('ro_'+k).value; db[k].p1 = document.getElementById('p1_'+k).value; db[k].p2 = document.getElementById('p2_'+k).value; db[k].p3 = document.getElementById('p3_'+k).value; db[k].reward = document.getElementById('rw_'+k).value; db[k].pass = document.getElementById('pas_'+k).value === "true"; db[k].date = document.getElementById('date_'+k).value; showModal("系統", "資料已更新"); }
+        function update(k) { db[k].status = document.getElementById('st_'+k).value; db[k].role = document.getElementById('ro_'+k).value; db[k].p1 = document.getElementById('p1_'+k).value; db[k].p2 = document.getElementById('p2_'+k).value; db[k].p3 = document.getElementById('p3_'+k).value; db[k].reward = document.getElementById('rw_'+k).value; db[k].pass = document.getElementById('pas_'+k).value === "true"; db[k].date = document.getElementById('date_'+k).value; localStorage.setItem('LyuFamilyDB', JSON.stringify(db)); showModal("系統", "資料已永久儲存"); }
     </script>
 </body>
 </html>
