@@ -54,9 +54,19 @@
             "A101": { name: "呂陳英妹", unit: "A", pass: true, p1: 98, p2: 97, p3: 98, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
             "A102": { name: "呂佳寯", unit: "A", pass: true, p1: 95, p2: 90, p3: 92, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
             "A103": { name: "呂佳芯", unit: "A", pass: true, p1: 90, p2: 85, p3: 88, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "A104": { name: "呂幸福", unit: "A", pass: true, p1: 85, p2: 88, p3: 86, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "A105": { name: "吳孟綺", unit: "A", pass: true, p1: 84, p2: 87, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "A106": { name: "呂理享", unit: "A", pass: true, p1: 86, p2: 85, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "A107": { name: "阮氏紅幸", unit: "A", pass: true, p1: 83, p2: 82, p3: 82, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "C301": { name: "呂寶梅", unit: "C", pass: true, p1: 82, p2: 85, p3: 83, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
+            "C302": { name: "劉沛緹", unit: "C", pass: true, p1: 80, p2: 84, p3: 82, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "C303": { name: "劉宗豪", unit: "C", pass: true, p1: 81, p2: 82, p3: 81, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "B201": { name: "於國輝", unit: "B", pass: true, p1: 84, p2: 86, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "幹部" },
+            "B202": { name: "於子祥", unit: "B", pass: true, p1: 82, p2: 85, p3: 83, openDate: "2026-05-18", reward: "無", status: "在職", role: "同仁" },
+            "B203": { name: "呂寶珠", unit: "B", pass: true, p1: 83, p2: 87, p3: 85, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
+            "B204": { name: "陳凱華", unit: "B", pass: true, p1: 81, p2: 83, p3: 82, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" },
             "B205": { name: "劉羿汝", unit: "B", pass: false, p1: 55, p2: 50, p3: 52, openDate: "2026-05-20", reward: "無", status: "撤職", role: "同仁" },
             "B206": { name: "陳俊廷", unit: "B", pass: true, p1: 82, p2: 80, p3: 81, openDate: "2026-05-31", reward: "無", status: "在職", role: "同仁" }
-            // 您可依此格式補齊其餘人員...
         };
 
         function verifyPerformance() {
@@ -71,7 +81,7 @@
                     <div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                         ${Object.entries(membersDatabase).map(([key, p], index) => `
                             <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs">
-                                <div class="text-white font-bold mb-2">${p.name} <span class="text-slate-500">(${key})</span></div>
+                                <div class="text-white font-bold mb-1">${p.name} (${key})</div>
                                 <div class="grid grid-cols-2 gap-2 mb-2">
                                     <select id="status_${index}" class="bg-slate-800 p-1 rounded text-center ${p.status === '在職' ? 'text-blue-400' : 'text-red-500'}">
                                         <option value="在職" ${p.status === '在職' ? 'selected' : ''}>在職</option>
@@ -97,7 +107,7 @@
                                     </select>
                                 </div>
                                 <input type="date" id="date_${index}" value="${p.openDate}" class="w-full bg-slate-800 p-1 rounded text-white text-center mb-2">
-                                <button onclick="updateMember('${key}', ${index})" class="w-full bg-indigo-600 py-1.5 rounded hover:bg-indigo-500 transition-all font-bold">儲存更新</button>
+                                <button onclick="updateMember('${key}', ${index})" class="w-full bg-indigo-600 py-1.5 rounded hover:bg-indigo-500 transition-all font-bold">儲存資料</button>
                             </div>`).join('')}
                     </div>`;
             } else if (membersDatabase[code]) {
