@@ -23,7 +23,6 @@
                 <i class="fa-solid fa-user-shield"></i> 年度考績系統
             </h2>
             
-            <!-- 查詢輸入區 -->
             <input type="password" id="memberKey" 
                     onkeydown="if(event.keyCode==13) verifyPerformance()"
                     lang="en" spellcheck="false" inputmode="latin"
@@ -35,7 +34,6 @@
                 Execute Verification
             </button>
 
-            <!-- 新增：密碼查詢專區 -->
             <div class="border-t border-slate-800 pt-6">
                 <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-3 text-center">忘記授權碼？查詢專區</p>
                 <div class="flex gap-2">
@@ -61,22 +59,85 @@
             "C301": { name: "呂寶梅", unit: "C", pass: true, p1: 82, p2: 85, p3: 83, openDate: "2026-05-31" },
             "C302": { name: "劉沛緹", unit: "C", pass: true, p1: 80, p2: 84, p3: 82, openDate: "2026-05-31" },
             "C303": { name: "劉宗豪", unit: "C", pass: true, p1: 81, p2: 82, p3: 81, openDate: "2026-05-31" },
-            "B201": { name: "于國輝", unit: "B", pass: true, p1: 84, p2: 86, p3: 85, openDate: "2026-05-31" },
-            "B202": { name: "于子祥", unit: "B", pass: true, p1: 82, p2: 85, p3: 83, openDate: "2026-05-18" },
+            "B201": { name: "於國輝", unit: "B", pass: true, p1: 84, p2: 86, p3: 85, openDate: "2026-05-31" },
+            "B202": { name: "於子祥", unit: "B", pass: true, p1: 82, p2: 85, p3: 83, openDate: "2026-05-18" },
             "B203": { name: "呂寶珠", unit: "B", pass: true, p1: 83, p2: 87, p3: 85, openDate: "2026-05-31" },
             "B204": { name: "陳凱華", unit: "B", pass: true, p1: 81, p2: 83, p3: 82, openDate: "2026-05-31" },
             "B205": { name: "劉羿汝", unit: "B", pass: false, p1: 55, p2: 50, p3: 52, openDate: "2026-05-20" },
             "B206": { name: "陳俊廷", unit: "B", pass: true, p1: 82, p2: 80, p3: 81, openDate: "2026-05-31" }
         };
 
-        function verifyPerformance() { /* (原本的邏輯) */ }
+        function verifyPerformance() {
+            const code = document.getElementById('memberKey').value.trim();
+            const output = document.getElementById('resultOutput');
+            output.classList.remove('hidden');
+            const now = new Date();
 
-        // 新增：授權碼查詢功能
+            if (code === "admin9999") {
+                output.innerHTML = `
+                    <h3 class="text-indigo-400 font-bold mb-4 text-xs uppercase tracking-widest text-center">管理員：全體資料維護</h3>
+                    <div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
+                        ${Object.entries(membersDatabase).map(([key, p], index) => `
+                            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs">
+                                <div class="text-white font-bold mb-1">${p.name} <span class="text-slate-500 font-normal">(${unitMap[p.unit]})</span></div>
+                                <div class="grid grid-cols-4 gap-1 mb-2">
+                                    <input type="number" id="p1_${index}" value="${p.p1}" class="bg-slate-800 p-1 rounded text-center text-white" placeholder="P1">
+                                    <input type="number" id="p2_${index}" value="${p.p2}" class="bg-slate-800 p-1 rounded text-center text-white" placeholder="P2">
+                                    <input type="number" id="p3_${index}" value="${p.p3}" class="bg-slate-800 p-1 rounded text-center text-white" placeholder="P3">
+                                    <select id="pass_${index}" class="bg-slate-800 p-1 rounded text-center ${p.pass ? 'text-emerald-400' : 'text-red-400'}">
+                                        <option value="true" ${p.pass ? 'selected' : ''}>P</option>
+                                        <option value="false" ${!p.pass ? 'selected' : ''}>F</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-slate-500 w-16">開放日:</span>
+                                    <input type="date" id="date_${index}" value="${p.openDate}" class="bg-slate-800 p-1 rounded text-white flex-grow">
+                                </div>
+                                <button onclick="updateMember('${key}', ${index})" class="w-full mt-3 bg-indigo-600 py-1.5 rounded hover:bg-indigo-500 transition-all font-bold">儲存設定</button>
+                            </div>`).join('')}
+                    </div>`;
+            } else if (membersDatabase[code]) {
+                const p = membersDatabase[code];
+                const openDate = new Date(p.openDate + "T00:00:00");
+                if (now < openDate) {
+                    output.innerHTML = `
+                        <div class="text-center p-4">
+                            <i class="fa-solid fa-calendar-xmark text-pink-500 text-3xl mb-4"></i>
+                            <h3 class="text-white font-bold text-lg">現在非開放查詢時間</h3>
+                            <p class="text-slate-400 text-xs mt-2">您的資料預計於 <span class="text-cyan-400 font-bold">${p.openDate}</span> 開放查詢。</p>
+                        </div>`;
+                } else {
+                    output.innerHTML = `
+                        <div class="text-center">
+                            <div class="inline-block px-3 py-1 bg-cyan-900/50 rounded-full text-[10px] font-bold text-cyan-300 mb-2 border border-cyan-500/30">
+                                <i class="fa-solid fa-building mr-1"></i> ${unitMap[p.unit]}
+                            </div>
+                            <h3 class="text-2xl font-black text-white mb-6">${p.name}</h3>
+                            <div class="grid grid-cols-3 gap-2 mb-6">
+                                <div class="bg-slate-900 p-2 rounded-lg"><p class="text-[8px] text-slate-500">表現</p><p class="font-bold text-white text-xs">${p.p1}</p></div>
+                                <div class="bg-slate-900 p-2 rounded-lg"><p class="text-[8px] text-slate-500">績效</p><p class="font-bold text-white text-xs">${p.p2}</p></div>
+                                <div class="bg-slate-900 p-2 rounded-lg"><p class="text-[8px] text-slate-500">總評</p><p class="font-bold text-cyan-400 text-xs">${p.p3}</p></div>
+                            </div>
+                        </div>`;
+                }
+            } else {
+                output.innerHTML = `<p class="text-pink-500 font-bold text-center text-xs">❌ 授權碼錯誤或無效</p>`;
+            }
+        }
+
+        function updateMember(key, index) {
+            membersDatabase[key].p1 = parseInt(document.getElementById(`p1_${index}`).value);
+            membersDatabase[key].p2 = parseInt(document.getElementById(`p2_${index}`).value);
+            membersDatabase[key].p3 = parseInt(document.getElementById(`p3_${index}`).value);
+            membersDatabase[key].pass = document.getElementById(`pass_${index}`).value === "true";
+            membersDatabase[key].openDate = document.getElementById(`date_${index}`).value;
+            alert(`[系統更新] ${membersDatabase[key].name} 資料已儲存！`);
+        }
+
         function findKey() {
             const name = document.getElementById('nameQuery').value.trim();
             const output = document.getElementById('resultOutput');
             output.classList.remove('hidden');
-
             const found = Object.entries(membersDatabase).find(([key, p]) => p.name === name);
             if (found) {
                 output.innerHTML = `<p class="text-emerald-400 font-bold text-center text-xs">🔍 您的授權碼為：<span class="text-white text-lg">${found[0]}</span></p>`;
