@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>呂氏家庭考績中心 - 16人完整版</title>
+    <title>呂氏家庭考績中心 - 最終整合版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { background: #020617; color: #f8fafc; font-family: sans-serif; }</style>
 </head>
@@ -13,7 +13,7 @@
         <h1 class="text-xl font-black mb-1 text-white">呂氏家庭考績中心</h1>
         <p class="text-[10px] text-cyan-400 mb-6 uppercase tracking-widest">政戰幹部：呂佳寯 負責</p>
         
-        <input type="text" id="memberKey" placeholder="輸入授權碼 (如 A101)..." onkeydown="if(event.key === 'Enter') verifyMember()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center">
+        <input type="text" id="memberKey" placeholder="輸入授權碼後按 Enter..." onkeydown="if(event.key === 'Enter') verifyMember()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center">
         <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold mb-6">查詢考績</button>
         
         <div class="pt-6 border-t border-slate-800">
@@ -32,19 +32,26 @@
         </div>
     </div>
 
-    <!-- 管理員後台 (密碼 admin9999) -->
+    <!-- 管理員後台入口 -->
     <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-500 uppercase">管理員後台</button>
+
+    <!-- 管理員後台介面 -->
+    <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護系統 (16人)</h2>
+                <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-white text-xl">✕</button>
+            </div>
+            <div id="dataRows" class="space-y-2"></div>
+        </div>
+    </div>
 
     <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[300]">
         <div class="bg-slate-900 p-8 rounded-3xl w-full max-w-sm border border-indigo-500 text-center">
             <h3 class="font-bold mb-4 text-indigo-400">管理員驗證</h3>
-            <input type="password" id="adminPass" placeholder="輸入密碼..." class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center text-white">
+            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center text-white">
             <button onclick="verifyAdmin()" class="w-full bg-indigo-600 py-2 rounded-lg font-bold">驗證進入</button>
         </div>
-    </div>
-
-    <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
-        <div class="max-w-6xl mx-auto"><div class="flex justify-between mb-6"><h2 class="text-indigo-400 font-bold">維護系統</h2><button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-white text-xl">✕</button></div><div id="dataRows" class="space-y-2"></div></div>
     </div>
 
     <script>
@@ -71,41 +78,38 @@
         function verifyMember() {
             const p = db[document.getElementById('memberKey').value.trim()];
             if(!p) { alert("授權碼錯誤"); return; }
-            if("2026-05-20" < p.openDate) { alert("尚未開放，開放日期：" + p.openDate); return; }
+            if("2026-05-20" < p.openDate) { alert("尚未開放查詢。開放日期：" + p.openDate); return; }
             document.getElementById('resTitle').innerText = p.name + " 的考績";
-            document.getElementById('resBody').innerHTML = `<p>總評：${p.p3}</p><p class="${p.pass?'text-emerald-400':'text-red-400'}">${p.pass?'考核通過':'考核未通過'}</p>`;
+            document.getElementById('resBody').innerHTML = `<p>總評分數：<span class="text-xl text-cyan-400">${p.p3}</span></p><p>最終裁決：<span class="${p.pass?'text-emerald-400':'text-red-400'} font-bold">${p.pass?'考核通過':'考核未通過'}</span></p>`;
             document.getElementById('resultModal').classList.remove('hidden');
         }
 
         function findKeyByName() {
             const key = Object.keys(db).find(k => db[k].name === document.getElementById('nameInput').value.trim());
-            document.getElementById('foundKeyResult').innerText = key ? "代碼: " + key : "查無此人";
+            document.getElementById('foundKeyResult').innerText = key ? "授權碼: " + key : "查無此人";
         }
 
         function verifyAdmin() { if(document.getElementById('adminPass').value === "admin9999") { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); renderAdminPanel(); } else alert("密碼錯誤"); }
 
         function renderAdminPanel() {
             document.getElementById('dataRows').innerHTML = Object.entries(db).map(([k, p]) => `
-                <div class="grid grid-cols-7 gap-1 items-center bg-slate-900 p-2 rounded text-[10px]">
-                    <div class="font-bold text-indigo-400">${p.name} (${k})</div>
+                <div class="grid grid-cols-8 gap-1 items-center bg-slate-900 p-2 rounded text-[9px]">
+                    <div class="font-bold text-indigo-400 truncate">${p.name} (${k})</div>
                     <select id="st_${k}" class="bg-slate-800"><option ${p.status=='在職'?'selected':''}>在職</option><option ${p.status=='撤職'?'selected':''}>撤職</option></select>
                     <select id="ro_${k}" class="bg-slate-800"><option ${p.role=='幹部'?'selected':''}>幹部</option><option ${p.role=='同仁'?'selected':''}>同仁</option></select>
                     <div class="flex gap-0.5"><input id="p1_${k}" value="${p.p1}" class="w-6 bg-slate-800 text-center"><input id="p2_${k}" value="${p.p2}" class="w-6 bg-slate-800 text-center"><input id="p3_${k}" value="${p.p3}" class="w-6 bg-slate-800 text-center"></div>
                     <select id="rw_${k}" class="bg-slate-800">${rewardOptions.map(r => `<option ${p.reward==r?'selected':''}>${r}</option>`).join('')}</select>
-                    <input id="date_${k}" type="date" value="${p.openDate}" class="bg-slate-800">
-                    <button onclick="update('${k}')" class="bg-indigo-600 py-1 rounded font-bold">儲存</button>
+                    <input id="date_${k}" type="date" value="${p.openDate}" class="bg-slate-800 text-[9px]">
+                    <select id="pas_${k}" class="bg-slate-800 font-bold ${p.pass ? 'text-emerald-400' : 'text-red-400'}"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
+                    <button onclick="update('${k}')" class="bg-indigo-600 px-2 py-1 rounded font-bold">儲存</button>
                 </div>`).join('');
         }
 
         function update(k) {
-            db[k].status = document.getElementById('st_'+k).value;
-            db[k].role = document.getElementById('ro_'+k).value;
-            db[k].p1 = document.getElementById('p1_'+k).value;
-            db[k].p2 = document.getElementById('p2_'+k).value;
-            db[k].p3 = document.getElementById('p3_'+k).value;
-            db[k].reward = document.getElementById('rw_'+k).value;
-            db[k].openDate = document.getElementById('date_'+k).value;
-            alert(db[k].name + " 已同步");
+            db[k].status = document.getElementById('st_'+k).value; db[k].role = document.getElementById('ro_'+k).value;
+            db[k].p1 = document.getElementById('p1_'+k).value; db[k].p2 = document.getElementById('p2_'+k).value; db[k].p3 = document.getElementById('p3_'+k).value;
+            db[k].reward = document.getElementById('rw_'+k).value; db[k].pass = document.getElementById('pas_'+k).value === "true"; db[k].openDate = document.getElementById('date_'+k).value;
+            alert(db[k].name + " 資料已同步");
         }
     </script>
 </body>
