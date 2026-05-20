@@ -12,28 +12,30 @@
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center justify-center">
 
-    <!-- 查詢區 -->
+    <!-- 一般查詢區 -->
     <section class="max-w-md w-full hex-card p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
-        <h1 class="text-lg font-black text-white tracking-widest mb-6">呂氏家庭考績中心</h1>
-        <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." onkeydown="if(event.keyCode==13) verifyMember()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
+        <h1 class="text-lg font-black text-white tracking-widest mb-2">呂氏家庭考績中心</h1>
+        <p class="text-[10px] text-cyan-400 mb-6 uppercase">政戰幹部：呂佳寯 負責</p>
+        
+        <input type="password" id="memberKey" maxlength="4" placeholder="輸入授權碼..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
         <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold uppercase tracking-widest text-sm">查詢考績</button>
         
         <div class="mt-6 pt-6 border-t border-slate-800">
             <input type="text" id="nameInput" placeholder="輸入姓名查詢授權碼" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-2">
             <button onclick="showSecurityWarning()" class="w-full bg-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-slate-700">查詢授權碼</button>
+            <div id="quickResult" class="mt-3 text-cyan-400 font-bold text-xs"></div>
         </div>
     </section>
 
-    <!-- 管理員入口 -->
-    <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-600 hover:text-white uppercase tracking-widest">
+    <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-500 hover:text-white uppercase tracking-widest">
         <i class="fa-solid fa-lock mr-1"></i> 管理員登入
     </button>
 
-    <!-- 管理員驗證 -->
-    <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-50">
+    <!-- 管理員彈窗與後台 -->
+    <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[100]">
         <div class="bg-slate-900 p-8 rounded-3xl w-full max-w-sm border border-indigo-500">
-            <h3 class="font-bold mb-4 text-center">後台管理驗證</h3>
-            <input type="password" id="adminPass" placeholder="輸入管理密碼..." onkeydown="if(event.keyCode==13) verifyAdmin()" class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-center">
+            <h3 class="font-bold mb-4 text-indigo-400">後台管理驗證</h3>
+            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-slate-800 p-3 rounded-lg mb-4 text-white text-center">
             <div class="flex gap-2">
                 <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="flex-1 bg-slate-700 py-2 rounded-lg text-xs">取消</button>
                 <button onclick="verifyAdmin()" class="flex-1 bg-indigo-600 py-2 rounded-lg text-xs font-bold">驗證進入</button>
@@ -41,19 +43,18 @@
         </div>
     </div>
 
-    <!-- 管理員後台面板 -->
-    <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-40">
+    <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
         <div class="max-w-2xl mx-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護</h2>
+                <h2 class="text-indigo-400 font-bold uppercase">全體資料維護 (16人)</h2>
                 <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="adminDataList" class="space-y-4 pb-20"></div>
         </div>
     </div>
 
-    <!-- 彈窗組件 -->
-    <div id="resultModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[200]">
+    <!-- 結果與資安彈窗 -->
+    <div id="resultModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[300]">
         <div class="bg-slate-900 p-8 rounded-3xl border border-cyan-500 w-full max-w-xs text-center relative">
             <button onclick="document.getElementById('resultModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
             <div id="modalBody" class="text-white space-y-3"></div>
@@ -61,33 +62,24 @@
         </div>
     </div>
 
-    <div id="securityModal" class="fixed inset-0 bg-red-950/90 hidden flex items-center justify-center p-4 z-[100]">
-        <div class="bg-slate-950 p-6 rounded-2xl border border-red-500 max-w-sm w-full text-center">
-            <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4"></i>
-            <h3 class="text-red-500 font-bold mb-2">系統安全警告</h3>
-            <p class="text-white text-xs mb-6">嚴禁洩漏授權碼，系統已記錄本次行為。</p>
-            <button onclick="findKey()" class="w-full bg-red-600 py-2 rounded-lg text-xs font-bold">確認繼續</button>
-        </div>
-    </div>
-
     <script>
-        let membersDatabase = {
-            "A101": { name: "呂陳英妹", unit: "總部", p3: 98, pass: true, reward: "無" },
-            "A102": { name: "呂佳寯", unit: "總部", p3: 92, pass: true, reward: "無" },
-            "A103": { name: "呂佳芯", unit: "總部", p3: 88, pass: true, reward: "無" },
-            "A104": { name: "呂幸福", unit: "總部", p3: 86, pass: true, reward: "無" },
-            "A105": { name: "吳孟綺", unit: "總部", p3: 85, pass: true, reward: "無" },
-            "A106": { name: "呂理享", unit: "總部", p3: 85, pass: true, reward: "無" },
-            "A107": { name: "阮氏紅幸", unit: "總部", p3: 82, pass: true, reward: "無" },
-            "C301": { name: "呂寶梅", unit: "第二分支", p3: 83, pass: true, reward: "無" },
-            "C302": { name: "劉沛緹", unit: "第二分支", p3: 82, pass: true, reward: "無" },
-            "C303": { name: "劉宗豪", unit: "第二分支", p3: 81, pass: true, reward: "無" },
-            "B201": { name: "于國輝", unit: "第一分支", p3: 85, pass: true, reward: "無" },
-            "B202": { name: "于子祥", unit: "第一分支", p3: 83, pass: true, reward: "無" },
-            "B203": { name: "呂寶珠", unit: "第一分支", p3: 85, pass: true, reward: "無" },
-            "B204": { name: "陳凱華", unit: "第一分支", p3: 82, pass: true, reward: "無" },
-            "B205": { name: "劉羿汝", unit: "第一分支", p3: 52, pass: false, reward: "無" },
-            "B206": { name: "陳俊廷", unit: "第一分支", p3: 81, pass: true, reward: "無" }
+        const membersDatabase = {
+            "A101": { name: "呂陳英妹", unit: "總部", p1: 98, p2: 97, p3: 98, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A102": { name: "呂佳寯", unit: "總部", p1: 95, p2: 90, p3: 92, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A103": { name: "呂佳芯", unit: "總部", p1: 90, p2: 85, p3: 88, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A104": { name: "呂幸福", unit: "總部", p1: 85, p2: 88, p3: 86, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A105": { name: "吳孟綺", unit: "總部", p1: 84, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A106": { name: "呂理享", unit: "總部", p1: 86, p2: 85, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "A107": { name: "阮氏紅幸", unit: "總部", p1: 83, p2: 82, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C301": { name: "呂寶梅", unit: "第二分支", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C302": { name: "劉沛緹", unit: "第二分支", p1: 80, p2: 84, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "C303": { name: "劉宗豪", unit: "第二分支", p1: 81, p2: 82, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B201": { name: "于國輝", unit: "第一分支", p1: 84, p2: 86, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B202": { name: "于子祥", unit: "第一分支", p1: 82, p2: 85, p3: 83, pass: true, reward: "無", openDate: "2026-05-18" },
+            "B203": { name: "呂寶珠", unit: "第一分支", p1: 83, p2: 87, p3: 85, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B204": { name: "陳凱華", unit: "第一分支", p1: 81, p2: 83, p3: 82, pass: true, reward: "無", openDate: "2026-05-31" },
+            "B205": { name: "劉羿汝", unit: "第一分支", p1: 55, p2: 50, p3: 52, pass: false, reward: "無", openDate: "2026-05-20" },
+            "B206": { name: "陳俊廷", unit: "第一分支", p1: 82, p2: 80, p3: 81, pass: true, reward: "無", openDate: "2026-05-31" }
         };
 
         function getGrade(s) { return s >= 90 ? "優秀" : s >= 80 ? "甲等" : s >= 70 ? "乙等" : "丁等"; }
@@ -101,28 +93,36 @@
                         <input type="number" id="p3_${key}" value="${p.p3}" class="bg-slate-800 p-1 text-center" placeholder="總評">
                         <select id="pas_${key}" class="bg-slate-800 p-1"><option value="true" ${p.pass?'selected':''}>通過</option><option value="false" ${!p.pass?'selected':''}>未通過</option></select>
                     </div>
-                    <button onclick="update('${key}')" class="w-full bg-indigo-600 py-1 rounded">儲存更新</button>
+                    <button onclick="update('${key}')" class="w-full bg-indigo-600 py-1 rounded font-bold">儲存更新</button>
                 </div>`).join('');
         }
 
         function update(key) {
             membersDatabase[key].p3 = parseInt(document.getElementById('p3_'+key).value);
             membersDatabase[key].pass = document.getElementById('pas_'+key).value === "true";
-            alert(membersDatabase[key].name + " 資料已更新");
+            alert("已更新 " + membersDatabase[key].name);
             renderAdminPanel();
         }
 
-        function verifyAdmin() { if (document.getElementById('adminPass').value === "admin9999") { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); renderAdminPanel(); } else { alert("密碼錯誤"); } }
-        function showSecurityWarning() { if(document.getElementById('nameInput').value.trim() !== "") document.getElementById('securityModal').classList.remove('hidden'); }
-        function findKey() { document.getElementById('securityModal').classList.add('hidden'); const name = document.getElementById('nameInput').value.trim(); const k = Object.keys(membersDatabase).find(k => membersDatabase[k].name === name); document.getElementById('quickResult').innerText = k ? `授權碼: ${k}` : "查無此人"; }
-        
+        function verifyAdmin() {
+            if(document.getElementById('adminPass').value === "admin9999") {
+                document.getElementById('adminModal').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                renderAdminPanel();
+            } else { alert("密碼錯誤"); }
+        }
+
         function verifyMember() {
             const p = membersDatabase[document.getElementById('memberKey').value];
             if(!p) { alert("授權碼錯誤"); return; }
+            if(new Date() < new Date(p.openDate)) { alert("未達開放時間"); return; }
             const isQualified = (p.p3 >= 70 && p.pass);
-            document.getElementById('modalBody').innerHTML = `<div class="text-2xl font-black">${p.name}</div><div class="text-cyan-400 font-bold">評等：${getGrade(p.p3)}</div><div class="font-bold ${isQualified?'text-emerald-400':'text-red-400'}">${isQualified?'✅ 考核通過':'❌ 考核未通過'}</div>`;
+            document.getElementById('modalBody').innerHTML = `<div class="text-2xl font-black">${p.name}</div><div class="text-cyan-400 font-bold">評等：${getGrade(p.p3)}</div><div class="text-sm mb-2">總評：${p.p3}</div><div class="font-bold ${isQualified?'text-emerald-400':'text-red-400'}">${isQualified?'✅ 考核通過':'❌ 考核未通過'}</div><div class="text-amber-400 text-xs mt-2">獎懲：${p.reward}</div>`;
             document.getElementById('resultModal').classList.remove('hidden');
         }
+
+        function showSecurityWarning() { if(document.getElementById('nameInput').value.trim() !== "") { document.body.insertAdjacentHTML('beforeend', '<div id="secModal" class="fixed inset-0 bg-red-950/90 flex items-center justify-center p-4 z-[300]"><div class="bg-slate-950 p-6 rounded-2xl text-center border border-red-500"><p class="text-white text-xs mb-4">嚴禁洩漏授權碼，系統已記錄行為。</p><button onclick="findKey()" class="w-full bg-red-600 py-2 rounded text-xs font-bold">確認查詢</button></div></div>'); } }
+        function findKey() { document.getElementById('secModal').remove(); const name = document.getElementById('nameInput').value.trim(); const k = Object.keys(membersDatabase).find(k => membersDatabase[k].name === name); document.getElementById('quickResult').innerText = k ? `授權碼: ${k}` : "❌ 查無此人"; }
     </script>
 </body>
 </html>
