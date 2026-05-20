@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>呂氏家庭考績中心 - 最終整合版</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>body { background: #020617; color: #f8fafc; font-family: sans-serif; }</style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center justify-center">
@@ -12,6 +13,13 @@
     <section class="max-w-md w-full bg-slate-900 p-8 rounded-3xl border border-cyan-500/30 shadow-2xl text-center">
         <h1 class="text-xl font-black mb-1 text-white">呂氏家庭考績中心</h1>
         <p class="text-[10px] text-cyan-400 mb-6 uppercase tracking-widest">政戰幹部：呂佳寯 負責</p>
+        
+        <!-- 安全警語 -->
+        <div class="mb-4 p-2 bg-red-950/50 border border-red-500/50 rounded-lg">
+            <p class="text-[10px] text-red-400 font-bold uppercase tracking-widest">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> 僅限本人授權碼查詢，嚴禁冒用與非法存取
+            </p>
+        </div>
         
         <input type="text" id="memberKey" placeholder="輸入授權碼後按 Enter..." onkeydown="if(event.key === 'Enter') verifyMember()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center">
         <button onclick="verifyMember()" class="w-full bg-cyan-600 py-4 rounded-xl font-bold mb-6">查詢考績</button>
@@ -23,7 +31,7 @@
         </div>
     </section>
 
-    <!-- 彈窗系統 -->
+    <!-- 結果顯示視窗 -->
     <div id="resultModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border border-cyan-500 p-8 rounded-3xl w-full max-w-sm text-center">
             <h2 id="resTitle" class="text-lg font-bold mb-4">查詢結果</h2>
@@ -35,7 +43,7 @@
     <!-- 管理員入口 -->
     <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="mt-8 text-[10px] text-slate-500 uppercase">管理員後台</button>
 
-    <!-- 管理員驗證 (加入 Enter 觸發) -->
+    <!-- 驗證與後台介面 -->
     <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[300]">
         <div class="bg-slate-900 p-8 rounded-3xl w-full max-w-sm border border-indigo-500 text-center">
             <h3 class="font-bold mb-4 text-indigo-400">管理員驗證</h3>
@@ -44,13 +52,11 @@
         </div>
     </div>
 
-    <!-- 後台介面 -->
     <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
         <div class="max-w-6xl mx-auto"><div class="flex justify-between mb-6"><h2 class="text-indigo-400 font-bold">資料維護系統</h2><button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-white text-xl">✕</button></div><div id="dataRows" class="space-y-2"></div></div>
     </div>
 
     <script>
-        // 資料與邏輯部分 (保持不變)
         const rewardOptions = ['無', '警告', '小過', '嘉獎', '小功', '大功'];
         let db = {
             "A101": { name: "呂陳英妹", role: "幹部", status: "在職", p1: 98, p2: 97, p3: 98, pass: true, reward: "無", openDate: "2026-05-31" },
@@ -76,7 +82,7 @@
             if(!p) { alert("授權碼錯誤"); return; }
             if("2026-05-20" < p.openDate) { alert("尚未開放，開放日期：" + p.openDate); return; }
             document.getElementById('resTitle').innerText = p.name + " 的考績";
-            document.getElementById('resBody').innerHTML = `<p>總評：<span class="text-xl text-cyan-400">${p.p3}</span></p><p class="${p.pass?'text-emerald-400':'text-red-400'} font-bold">${p.pass?'考核通過':'考核未通過'}</p>`;
+            document.getElementById('resBody').innerHTML = `<p>總評分數：<span class="text-xl text-cyan-400">${p.p3}</span></p><p>最終裁決：<span class="${p.pass?'text-emerald-400':'text-red-400'} font-bold">${p.pass?'考核通過':'考核未通過'}</span></p>`;
             document.getElementById('resultModal').classList.remove('hidden');
         }
 
