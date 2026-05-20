@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>呂氏家庭生活資訊網 3.0</title>
+    <title>呂氏家庭生活資訊網 3.0 - 年度考績</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
@@ -15,11 +15,11 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-10">
+<body class="min-h-screen p-4 md:p-10 flex items-center justify-center">
 
-    <section id="performance" class="max-w-2xl mx-auto">
+    <section id="performance" class="max-w-md w-full">
         <div class="hex-card p-8 rounded-3xl border border-cyan-500/30 shadow-2xl">
-            <h2 class="text-2xl font-black text-cyan-400 mb-6 flex items-center gap-2">
+            <h2 class="text-xl font-black text-cyan-400 mb-6 flex items-center gap-2">
                 <i class="fa-solid fa-user-shield"></i> 年度考績查詢 (數據矩陣)
             </h2>
             
@@ -28,7 +28,7 @@
                    placeholder="輸入授權碼...">
             
             <button onclick="verifyPerformance()" 
-                    class="w-full bg-cyan-600 font-black py-4 rounded-xl hover:bg-cyan-500 transition-all uppercase tracking-widest">
+                    class="w-full bg-cyan-600 font-black py-4 rounded-xl hover:bg-cyan-500 transition-all uppercase tracking-widest text-sm">
                 Execute Verification
             </button>
 
@@ -37,19 +37,25 @@
     </section>
 
     <script>
-        // 16位家族成員資料庫
         const membersDatabase = {
-            "妹555": { name: "呂陳英妹", unit: "總部" }, "雋202": { name: "呂佳寯", unit: "總部" },
-            "芯821": { name: "呂佳芯", unit: "總部" }, "福777": { name: "呂幸福", unit: "總部" },
-            "綺111": { name: "吳孟綺", unit: "總部" }, "享123": { name: "呂理享", unit: "總部" },
-            "幸001": { name: "阮氏紅幸", unit: "總部" }, "梅666": { name: "呂寶梅", unit: "第二分支" },
-            "緹999": { name: "劉沛緹", unit: "第二分支" }, "豪888": { name: "劉宗豪", unit: "第二分支" },
-            "輝321": { name: "于國輝", unit: "第一分支" }, "祥520": { name: "于子祥", unit: "第一分支" },
-            "珠889": { name: "呂寶珠", unit: "第一分支" }, "華711": { name: "陳凱華", unit: "第一分支" },
-            "汝101": { name: "劉羿汝", unit: "第一分支" }, "廷991": { name: "陳俊廷", unit: "第一分支" }
+            "妹555": { name: "呂陳英妹", unit: "總部", pass: true, p1: 98, p2: 97, p3: 98 },
+            "雋202": { name: "呂佳寯", unit: "總部", pass: true, p1: 95, p2: 90, p3: 92 },
+            "芯821": { name: "呂佳芯", unit: "總部", pass: true, p1: 90, p2: 85, p3: 88 },
+            "福777": { name: "呂幸福", unit: "總部", pass: true, p1: 85, p2: 88, p3: 86 },
+            "綺111": { name: "吳孟綺", unit: "總部", pass: true, p1: 84, p2: 87, p3: 85 },
+            "享123": { name: "呂理享", unit: "總部", pass: true, p1: 86, p2: 85, p3: 85 },
+            "幸001": { name: "阮氏紅幸", unit: "總部", pass: true, p1: 83, p2: 82, p3: 82 },
+            "梅666": { name: "呂寶梅", unit: "第二分支", pass: true, p1: 82, p2: 85, p3: 83 },
+            "緹999": { name: "劉沛緹", unit: "第二分支", pass: true, p1: 80, p2: 84, p3: 82 },
+            "豪888": { name: "劉宗豪", unit: "第二分支", pass: true, p1: 81, p2: 82, p3: 81 },
+            "輝321": { name: "於國輝", unit: "第一分支", pass: true, p1: 84, p2: 86, p3: 85 },
+            "祥520": { name: "於子祥", unit: "第一分支", pass: true, p1: 82, p2: 85, p3: 83 },
+            "珠889": { name: "呂寶珠", unit: "第一分支", pass: true, p1: 83, p2: 87, p3: 85 },
+            "華711": { name: "陳凱華", unit: "第一分支", pass: true, p1: 81, p2: 83, p3: 82 },
+            "汝101": { name: "劉羿汝", unit: "第一分支", pass: false, p1: 55, p2: 50, p3: 52 },
+            "廷991": { name: "陳俊廷", unit: "第一分支", pass: true, p1: 82, p2: 80, p3: 81 }
         };
 
-        // 核心驗證邏輯
         function verifyPerformance() {
             const code = document.getElementById('memberKey').value.trim();
             const output = document.getElementById('resultOutput');
@@ -57,27 +63,39 @@
 
             if (code === "admin999") {
                 output.innerHTML = `
-                    <h3 class="text-indigo-400 font-bold mb-4 uppercase text-sm tracking-widest">系統管理員：全家族績效一覽</h3>
+                    <h3 class="text-indigo-400 font-bold mb-4 text-xs uppercase tracking-widest text-center">系統管理員：全家族績效一覽</h3>
                     <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
                         ${Object.entries(membersDatabase).map(([key, p]) => `
                             <div class="flex justify-between border-b border-slate-800 py-2 text-xs">
-                                <span class="text-white font-bold">${p.name}</span>
-                                <span class="text-slate-400">${p.unit}</span>
+                                <span class="text-white">${p.name}</span>
+                                <span class="${p.pass ? 'text-emerald-400' : 'text-red-500'} font-bold">${p.pass ? '通過' : '未通過'}</span>
                             </div>`).join('')}
                     </div>`;
             } else if (membersDatabase[code]) {
                 const p = membersDatabase[code];
                 output.innerHTML = `
                     <div class="text-center">
-                        <p class="text-slate-500 text-[10px] uppercase mb-2">身份驗證通過</p>
-                        <h3 class="text-2xl font-black text-white">${p.name}</h3>
-                        <p class="text-cyan-400 font-bold mb-6">${p.unit}</p>
-                        <a href="#" class="inline-block px-8 py-3 bg-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-all">
-                            前往年度考核表
-                        </a>
+                        <h3 class="text-2xl font-black text-white mb-1">${p.name}</h3>
+                        <p class="text-cyan-400 font-bold mb-4 text-sm">${p.unit}</p>
+                        <p class="font-black text-lg mb-6 ${p.pass ? 'text-emerald-400' : 'text-red-500'}">年度考核：${p.pass ? "通過" : "未通過"}</p>
+                        <div class="grid grid-cols-3 gap-2 mb-6">
+                            <div class="bg-slate-900 p-2 rounded-lg border border-slate-700">
+                                <p class="text-[8px] text-slate-500">個人表現</p>
+                                <p class="font-bold text-white text-xs">${p.p1}</p>
+                            </div>
+                            <div class="bg-slate-900 p-2 rounded-lg border border-slate-700">
+                                <p class="text-[8px] text-slate-500">特別績效</p>
+                                <p class="font-bold text-white text-xs">${p.p2}</p>
+                            </div>
+                            <div class="bg-slate-900 p-2 rounded-lg border border-slate-700">
+                                <p class="text-[8px] text-slate-500">綜合評比</p>
+                                <p class="font-bold text-cyan-400 text-xs">${p.p3}</p>
+                            </div>
+                        </div>
+                        <a href="#" class="block w-full py-3 bg-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-all">詳細考核報告</a>
                     </div>`;
             } else {
-                output.innerHTML = `<p class="text-pink-500 font-bold text-center">❌ 授權碼無效，請重新嘗試。</p>`;
+                output.innerHTML = `<p class="text-pink-500 font-bold text-center text-xs">❌ 授權碼錯誤或無權限。</p>`;
             }
         }
     </script>
