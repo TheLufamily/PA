@@ -2,98 +2,306 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>呂氏家庭考績中心 - 考績查詢系統</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>呂氏家庭2026年度活動</title>
     <style>
-        body { background: #020617; color: #f8fafc; font-family: 'Courier New', monospace; }
-        .ui-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 2rem; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #FFF5EE;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+        /* 頂部導覽列：無漢堡選單，標題置中 */
+        header {
+            width: 100%;
+            max-width: 500px;
+            background-color: #ffffff;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 {
+            color: #FF6600;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        /* 主容器 */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        /* 活動卡片結構 */
+        .card {
+            background-color: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            position: relative;
+            border: 1px solid #f0f0f0;
+            padding: 35px 24px 28px 24px;
+        }
+        /* 分類標籤區 */
+        .tag {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #FF5500;
+            color: #ffffff;
+            padding: 8px 20px;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-bottom-right-radius: 16px;
+            text-transform: uppercase;
+        }
+        /* 日期與標題區 */
+        .card-header {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .date {
+            font-size: 64px;
+            font-weight: 800;
+            color: #222222;
+            line-height: 1;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333333;
+        }
+        /* 內文描述 */
+        .description {
+            font-size: 15px;
+            color: #666666;
+            line-height: 1.6;
+            text-align: justify;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+        /* 點擊看詳細活動資訊的現代白底黑框按鈕 */
+        .btn-intro {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: #ffffff;
+            color: #1A1A1A;
+            border: 2px solid #1A1A1A;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-intro:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-1px);
+        }
+        
+        /* 彈出視窗 (Modal) 樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #FFF5EE;
+            padding-bottom: 8px;
+        }
+        .modal-body {
+            font-size: 15px;
+            color: #444444;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .modal-body ul {
+            list-style-type: none;
+            margin-top: 10px;
+        }
+        .modal-body li {
+            margin-bottom: 8px;
+            padding-left: 14px;
+            position: relative;
+        }
+        .modal-body li::before {
+            content: "•";
+            color: #FF5500;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        .btn-close {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #1A1A1A;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-close:hover {
+            background-color: #333333;
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 flex flex-col items-center justify-center">
+<body>
 
-    <div id="systemModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-[1000] p-4">
-        <div class="bg-[#0f172a] border border-indigo-500 p-8 rounded-3xl w-full max-w-sm text-center shadow-2xl">
-            <div id="modalTitle" class="text-lg font-bold text-white mb-4 uppercase">系統提示</div>
-            <div id="modalBody" class="text-sm text-slate-300 mb-6"></div>
-            <button onclick="document.getElementById('systemModal').classList.add('hidden')" class="w-full bg-[#4f46e5] py-3 rounded-lg font-bold text-white">確認</button>
-        </div>
-    </div>
+    <!-- 頂部導覽列 -->
+    <header>
+        <h1>呂氏家庭2026年度活動</h1>
+    </header>
 
-    <section class="ui-box max-w-md w-full p-8 text-center shadow-2xl">
-        <h1 class="text-xl font-black mb-1 text-white">呂氏家庭考績中心</h1>
-        <p class="text-[10px] text-cyan-400 mb-6 uppercase tracking-widest">政戰幹部：呂佳寯 負責</p>
-        <div class="mb-4 p-3 border border-red-900 bg-red-950/30 rounded-xl">
-            <p class="text-[10px] text-red-400 font-bold uppercase"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 僅限本人授權碼查詢，嚴禁冒用</p>
-        </div>
-        <input type="text" id="memberKey" placeholder="輸入授權碼..." class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-6 py-4 mb-4 text-center text-white">
-        <button onclick="verifyMember()" class="w-full bg-[#0891b2] py-4 rounded-xl font-bold mb-4 text-white hover:bg-[#06748c]">查詢考績</button>
-        <input type="text" id="nameInput" placeholder="輸入姓名找回代碼" class="w-full bg-[#1e293b] border border-slate-700 rounded-lg px-4 py-3 mb-2 text-center text-sm text-white">
-        <button onclick="findKeyByName()" class="w-full bg-[#1e293b] py-3 rounded-lg text-xs font-bold hover:bg-slate-700 text-white mb-6">查詢專屬代碼</button>
-        <button onclick="document.getElementById('adminModal').classList.remove('hidden')" class="w-full bg-[#4f46e5] py-4 rounded-xl font-bold text-white hover:bg-[#4338ca] transition">
-            <i class="fa-solid fa-shield-halved mr-2"></i> 管理員登入
-        </button>
-    </section>
+    <!-- 活動列表容器 -->
+    <div class="container">
 
-    <div id="adminPanel" class="fixed inset-0 bg-slate-950 hidden p-4 overflow-y-auto z-[200]">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-indigo-400 font-bold text-2xl">資料維護系統</h2>
-                <div class="flex gap-4">
-                    <button onclick="saveAll()" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold text-white hover:bg-emerald-500">一鍵全部儲存</button>
-                    <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-white text-2xl">✕</button>
-                </div>
+        <!-- 活動一：新年圍爐 -->
+        <div class="card">
+            <div class="tag">New Year Reunion</div>
+            <div class="card-header">
+                <div class="date">02.17</div>
+                <div class="title">新年圍爐大團圓</div>
             </div>
-            <div id="dataRows" class="space-y-2"></div>
+            <p class="description">
+                歲末迎春的最核心時刻！全家族齊聚一堂共享熱騰騰的年夜飯，從經典年菜到溫暖火鍋，伴隨歡聲笑語齊守歲，分發福氣紅包，共同開啟充滿希望的全新一年。
+            </p>
+            <button class="btn-intro" onclick="openModal('reunion')">活動介紹 →</button>
         </div>
+
+        <!-- 活動二：母親節慶祝 -->
+        <div class="card">
+            <div class="tag">Love & Gratitude</div>
+            <div class="card-header">
+                <div class="date">05.10</div>
+                <div class="title">母親節感恩聚餐</div>
+            </div>
+            <p class="description">
+                屬於媽媽的專屬節日！今年特別訂製了精緻的康乃馨花束與特製蛋糕，邀請全家大小一同聚餐，向辛苦耕耘家庭的媽媽以及所有母親致上最深深謝意。
+            </p>
+            <button class="btn-intro" onclick="openModal('mothersday')">活動介紹 →</button>
+        </div>
+
+        <!-- 活動三：中秋烤肉 -->
+        <div class="card">
+            <div class="tag">Mid-Autumn Festival</div>
+            <div class="card-header">
+                <div class="date">09.25</div>
+                <div class="title">中秋明月狂歡烤肉</div>
+            </div>
+            <p class="description">
+                年度最受期待的戶外派對！頂級海陸食材炭火直烤，搭配家族秘傳醬汁，在皎潔明月下伴隨音樂、香氣與歡笑聲，拉近彼此的心，度過溫馨又狂歡的中秋之夜。
+            </p>
+            <button class="btn-intro" onclick="openModal('midautumn')">活動介紹 →</button>
+        </div>
+
     </div>
 
-    <div id="adminModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[300]">
-        <div class="bg-[#0f172a] border border-[#312e81] p-8 rounded-[2rem] w-full max-w-sm text-center">
-            <h3 class="font-bold mb-6 text-white text-xl">管理員驗證</h3>
-            <input type="password" id="adminPass" placeholder="輸入管理密碼..." class="w-full bg-[#1e293b] border border-slate-600 rounded-xl px-6 py-5 mb-6 text-center text-white">
-            <button onclick="verifyAdmin()" class="w-full bg-[#4f46e5] py-5 rounded-xl font-bold text-white hover:bg-[#4338ca]">驗證進入</button>
+    <!-- 彈出視窗模組 -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-title" id="modalTitle">活動資訊</div>
+            <div class="modal-body" id="modalBody">
+                載入中...
+            </div>
+            <button class="btn-close" onclick="closeModal(null)">關閉視窗</button>
         </div>
     </div>
 
     <script>
-        const TODAY = "2026-05-20";
-        let db = JSON.parse(localStorage.getItem('LyuFamilyDB')) || {
-            "A101": { name: "呂陳英妹", role: "幹部", status: "在職", p1: 98, p2: 97, p3: 98, reward: "無", pass: true, date: "2026-05-31" },
-            "A102": { name: "呂佳寯", role: "幹部", status: "在職", p1: 95, p2: 90, p3: 92, reward: "無", pass: true, date: "2026-05-31" },
-            "A103": { name: "呂佳芯", role: "同仁", status: "在職", p1: 90, p2: 85, p3: 88, reward: "無", pass: true, date: "2026-05-31" },
-            "A104": { name: "呂幸福", role: "同仁", status: "在職", p1: 85, p2: 88, p3: 86, reward: "無", pass: true, date: "2026-05-31" },
-            "A105": { name: "吳孟綺", role: "同仁", status: "在職", p1: 84, p2: 87, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
-            "A106": { name: "呂理享", role: "同仁", status: "在職", p1: 86, p2: 85, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
-            "A107": { name: "阮氏紅幸", role: "同仁", status: "在職", p1: 83, p2: 82, p3: 82, reward: "無", pass: true, date: "2026-05-31" },
-            "C301": { name: "呂寶梅", role: "幹部", status: "在職", p1: 82, p2: 85, p3: 83, reward: "無", pass: true, date: "2026-05-31" },
-            "C302": { name: "劉沛緹", role: "同仁", status: "在職", p1: 80, p2: 84, p3: 82, reward: "無", pass: true, date: "2026-05-31" },
-            "C303": { name: "劉宗豪", role: "同仁", status: "在職", p1: 81, p2: 82, p3: 81, reward: "無", pass: true, date: "2026-05-31" },
-            "B201": { name: "于國輝", role: "幹部", status: "在職", p1: 84, p2: 86, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
-            "B202": { name: "于子祥", role: "同仁", status: "在職", p1: 82, p2: 85, p3: 83, reward: "無", pass: true, date: "2026-05-18" },
-            "B203": { name: "呂寶珠", role: "同仁", status: "在職", p1: 83, p2: 87, p3: 85, reward: "無", pass: true, date: "2026-05-31" },
-            "B204": { name: "陳凱華", role: "同仁", status: "在職", p1: 81, p2: 83, p3: 82, reward: "無", pass: true, date: "2026-05-31" },
-            "B205": { name: "劉羿汝", role: "同仁", status: "撤職", p1: 55, p2: 50, p3: 52, reward: "無", pass: false, date: "2026-05-20" },
-            "B206": { name: "陳俊廷", role: "同仁", status: "在職", p1: 82, p2: 80, p3: 81, reward: "無", pass: true, date: "2026-05-31" }
+        // 活動詳細資訊數據庫
+        const eventDetails = {
+            reunion: {
+                title: "🏮 新年圍爐大團圓 - 詳細資訊",
+                content: "歡迎參與呂氏家族最溫馨的除夕夜！以下為本次圍爐活動流程與說明：<ul><li><strong>活動時間：</strong>2026年2月17日 (除夕) 下午 18:00 入席</li><li><strong>美味焦點：</strong>家族私房雙料火鍋、佛跳牆、香煎大年糕等經典年菜。</li><li><strong>特別企劃：</strong>守歲迎新春、福氣大紅包抽抽樂、年度家族合照留念。</li></ul>"
+            },
+            mothersday: {
+                title: "🌹 母親節感恩聚餐 - 詳細資訊",
+                content: "溫馨五月天，讓我們一同向家中最偉大的媽媽與長輩表達愛意：<ul><li><strong>活動時間：</strong>2026年5月10日 (週日) 中午 12:00</li><li><strong>感恩好禮：</strong>全體子女合贈精緻手工康乃馨花束。</li><li><strong>驚喜企劃：</strong>特製減糖高質感大蛋糕、感恩致詞卡片環節，給媽媽滿滿的感動。</li></ul>"
+            },
+            midautumn: {
+                title: "🌕 中秋明月狂歡烤肉 - 詳細資訊",
+                content: "月圓人團圓，呂氏家族年度最嗨的戶外BBQ派對準時引爆：<ul><li><strong>活動時間：</strong>2026年9月25日 傍晚 17:30 開始</li><li><strong>頂級食材：</strong>澎湖空運海鮮、頂級霜降牛、家族秘製獨門烤肉醬。</li><li><strong>現場氣氛：</strong>露天星光音樂會、趣味剝柚子大賽、歡樂茶敘暢聊。</li></ul>"
+            }
         };
 
-        function showModal(t, b) { document.getElementById('modalTitle').innerText = t; document.getElementById('modalBody').innerHTML = b; document.getElementById('systemModal').classList.remove('hidden'); }
-        function getPassColor(v) { return v==='true' ? 'text-emerald-400' : (v==='false' ? 'text-red-400' : 'text-orange-400'); }
-        function verifyMember() { const p = db[document.getElementById('memberKey').value.trim()]; if(!p) showModal("錯誤", "無效代碼"); else if(TODAY < p.date) showModal("系統訊息", "未達開放時間：" + p.date); else showModal("考績結果", `姓名：${p.name}<br>總評：${p.p3}<br>狀態：${p.pass===true ? "通過" : (p.pass===false ? "未通過" : "考核中")}`); }
-        function findKeyByName() { const k = Object.keys(db).find(k => db[k].name === document.getElementById('nameInput').value.trim()); showModal("查詢結果", k ? "代碼: " + k : "查無此人"); }
-        function verifyAdmin() { if(document.getElementById('adminPass').value === "admin9999") { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); renderAdminPanel(); } else showModal("錯誤", "密碼錯誤"); }
-        function renderAdminPanel() { document.getElementById('dataRows').innerHTML = Object.entries(db).map(([k, p]) => `
-            <div class="grid grid-cols-[1.5fr,1fr,1fr,1.8fr,1fr,1.5fr,1.2fr] gap-2 items-center bg-slate-900 p-2 rounded text-sm text-white">
-                <div class="truncate font-bold">${p.name} (${k})</div>
-                <select id="st_${k}" class="bg-slate-800 p-1 rounded">${['在職', '撤職'].map(s => `<option ${p.status==s?'selected':''}>${s}</option>`).join('')}</select>
-                <select id="ro_${k}" class="bg-slate-800 p-1 rounded">${['幹部', '同仁'].map(r => `<option ${p.role==r?'selected':''}>${r}</option>`).join('')}</select>
-                <div class="flex gap-1 items-center"><input id="p1_${k}" value="${p.p1}" class="w-8 bg-slate-800 text-center"><input id="p2_${k}" value="${p.p2}" class="w-8 bg-slate-800 text-center"><input id="p3_${k}" value="${p.p3}" class="w-8 bg-slate-800 text-center"><button onclick="resetScore('${k}')" class="bg-red-700 px-1 ml-1 rounded text-[8px]">歸零</button></div>
-                <select id="rw_${k}" class="bg-slate-800 p-1 rounded">${['無', '警告', '小過', '嘉獎', '小功', '大功'].map(r => `<option ${p.reward==r?'selected':''}>${r}</option>`).join('')}</select>
-                <input id="date_${k}" type="date" value="${p.date}" class="bg-slate-800 p-1 rounded">
-                <select id="pas_${k}" onchange="this.className='bg-slate-800 p-1 rounded '+getPassColor(this.value)" class="bg-slate-800 p-1 rounded ${getPassColor(String(p.pass))}"><option value="true" ${p.pass===true?'selected':''}>通過</option><option value="false" ${p.pass===false?'selected':''}>未通過</option><option value="pending" ${p.pass==='pending'?'selected':''}>考核中</option></select>
-            </div>`).join(''); }
-        function resetScore(k) { document.getElementById('p1_'+k).value=0; document.getElementById('p2_'+k).value=0; document.getElementById('p3_'+k).value=0; }
-        function saveAll() { Object.keys(db).forEach(k => { db[k].status = document.getElementById('st_'+k).value; db[k].role = document.getElementById('ro_'+k).value; db[k].p1 = document.getElementById('p1_'+k).value; db[k].p2 = document.getElementById('p2_'+k).value; db[k].p3 = document.getElementById('p3_'+k).value; db[k].reward = document.getElementById('rw_'+k).value; db[k].pass = document.getElementById('pas_'+k).value === "true" ? true : (document.getElementById('pas_'+k).value === "false" ? false : 'pending'); db[k].date = document.getElementById('date_'+k).value; }); localStorage.setItem('LyuFamilyDB', JSON.stringify(db)); showModal("系統", "資料已永久儲存"); }
+        // 開啟彈出視窗
+        function openModal(key) {
+            const data = eventDetails[key];
+            if (data) {
+                document.getElementById('modalTitle').innerHTML = data.title;
+                document.getElementById('modalBody').innerHTML = data.content;
+                document.getElementById('modalOverlay').classList.add('active');
+                document.body.style.overflow = 'hidden'; // 鎖定底層滾動
+            }
+        }
+
+        // 關閉彈出視窗
+        function closeModal(e) {
+            if (e === null || e.target === document.getElementById('modalOverlay') || e.type === 'click') {
+                document.getElementById('modalOverlay').classList.remove('active');
+                document.body.style.overflow = ''; // 恢復滾動
+            }
+        }
     </script>
 </body>
 </html>
